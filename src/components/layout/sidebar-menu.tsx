@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useAuth } from "@/components/providers/auth-provider";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -17,25 +18,8 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
     const pathname = usePathname();
     const router = useRouter();
     const supabase = createClient();
-    const [userRole, setUserRole] = useState<string | null>(null);
-
-    useEffect(() => {
-        const getUserRole = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                const { data: profile } = await supabase
-                    .from("profiles")
-                    .select("role")
-                    .eq("id", user.id)
-                    .single();
-
-                if (profile) {
-                    setUserRole(profile.role);
-                }
-            }
-        };
-        getUserRole();
-    }, []);
+    const { profile } = useAuth();
+    const userRole = profile?.role;
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();

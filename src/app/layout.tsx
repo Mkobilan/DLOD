@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import { PWAProvider } from "@/components/pwa-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,10 +30,12 @@ export default function RootLayout({
         className={`${inter.variable} antialiased bg-background text-foreground`}
       >
         <PWAProvider>
-          <Header />
-          <div className="pt-16">
-            {children}
-          </div>
+          <AuthProvider>
+            <Header />
+            <div className="pt-16">
+              {children}
+            </div>
+          </AuthProvider>
         </PWAProvider>
       </body>
     </html>

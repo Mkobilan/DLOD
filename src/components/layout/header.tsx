@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
+import { useAuth } from "@/components/providers/auth-provider";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/ui/notification-bell";
@@ -31,27 +31,7 @@ function InstallButton() {
 
 export default function Header() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [userProfile, setUserProfile] = useState<any>(null);
-    const supabase = createClient();
-
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                const { data: profile } = await supabase
-                    .from("profiles")
-                    .select("*")
-                    .eq("id", user.id)
-                    .single();
-
-                if (profile) {
-                    setUserProfile(profile);
-                }
-            }
-        };
-
-        fetchUserProfile();
-    }, []);
+    const { profile: userProfile } = useAuth();
 
     return (
         <>
@@ -100,7 +80,7 @@ export default function Header() {
                                     ) : (
                                         <div className="flex h-full w-full items-center justify-center bg-slate-800 text-gray-400">
                                             <span className="text-sm font-semibold">
-                                                {userProfile.full_name?.charAt(0).toUpperCase()}
+                                                {(userProfile.full_name || "U").charAt(0).toUpperCase()}
                                             </span>
                                         </div>
                                     )}
