@@ -1,4 +1,4 @@
-const CACHE_NAME = "dlod-cache-v1";
+const CACHE_NAME = "dlod-cache-v2";
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
@@ -6,14 +6,36 @@ self.addEventListener("install", (event) => {
             return cache.addAll([
                 "/",
                 "/manifest.json",
-                "/globals.css",
                 "/logo.jpg"
-            ]);
+            ]).catch((error) => {
+                console.error("Cache addAll failed:", error);
+            });
         })
     );
+    self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+    self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
+    // Only cache GET requests
+    if (event.request.method !== "GET") {
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then((response) => {
             return response || fetch(event.request);
