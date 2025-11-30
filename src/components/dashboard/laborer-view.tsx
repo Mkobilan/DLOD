@@ -1,0 +1,83 @@
+"use client";
+
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch"; // Need to create this
+import { Label } from "@/components/ui/label";
+import { MapPin, Briefcase, User } from "lucide-react";
+
+export default function LaborerDashboard({ profile }: { profile: any }) {
+    const [isAvailable, setIsAvailable] = useState(profile.is_available);
+    const supabase = createClient();
+
+    const toggleAvailability = async (checked: boolean) => {
+        setIsAvailable(checked);
+        await supabase
+            .from("profiles")
+            .update({ is_available: checked })
+            .eq("id", profile.id);
+    };
+
+    return (
+        <div className="container mx-auto p-4 space-y-6 pb-20">
+            <header className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-2xl font-bold text-white">Hello, {profile.full_name}</h1>
+                    <p className="text-gray-400">Ready to work today?</p>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/5 p-2 rounded-lg border border-white/10">
+                    <Switch
+                        id="availability"
+                        checked={isAvailable}
+                        onCheckedChange={toggleAvailability}
+                    />
+                    <Label htmlFor="availability" className={isAvailable ? "text-green-400" : "text-gray-400"}>
+                        {isAvailable ? "Available" : "Offline"}
+                    </Label>
+                </div>
+            </header>
+
+            <div className="grid gap-4 md:grid-cols-2">
+                <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/20">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-white">
+                            Job Requests
+                        </CardTitle>
+                        <Briefcase className="h-4 w-4 text-primary" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-white">0</div>
+                        <p className="text-xs text-gray-400">
+                            Active job invitations
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-secondary/20 to-secondary/5 border-secondary/20">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-white">
+                            Profile Views
+                        </CardTitle>
+                        <User className="h-4 w-4 text-secondary" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-white">0</div>
+                        <p className="text-xs text-gray-400">
+                            Contractors viewed you today
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <section>
+                <h2 className="text-xl font-semibold text-white mb-4">Find Work Nearby</h2>
+                <div className="bg-white/5 rounded-xl p-8 text-center border border-white/10">
+                    <MapPin className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-400">Job feed coming soon...</p>
+                </div>
+            </section>
+        </div>
+    );
+}
