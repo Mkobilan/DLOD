@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,18 +68,33 @@ export default function LaborerSearchPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {filteredLaborers.map((laborer) => (
                     <Card key={laborer.id} className="flex flex-col border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
-                        <CardHeader className="flex flex-row items-center gap-4">
-                            <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xl">
-                                {laborer.full_name?.[0] || "?"}
-                            </div>
-                            <div>
-                                <CardTitle className="text-lg text-white">{laborer.full_name}</CardTitle>
-                                <div className="flex items-center text-gray-400 text-xs mt-1">
-                                    <MapPin className="h-3 w-3 mr-1 text-secondary" />
-                                    {laborer.city}, {laborer.state}
+                        <Link href={`/profile/${laborer.id}`} className="cursor-pointer">
+                            <CardHeader className="flex flex-row items-center gap-4">
+                                <div className="relative h-12 w-12 rounded-full overflow-hidden bg-slate-800 shrink-0 border border-white/10">
+                                    {laborer.avatar_url ? (
+                                        <Image
+                                            src={laborer.avatar_url}
+                                            alt={laborer.full_name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex h-full w-full items-center justify-center bg-primary/20 text-primary font-bold text-xl">
+                                            {laborer.full_name?.[0] || "?"}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        </CardHeader>
+                                <div>
+                                    <CardTitle className="text-lg text-white hover:text-primary transition-colors">
+                                        {laborer.full_name}
+                                    </CardTitle>
+                                    <div className="flex items-center text-gray-400 text-xs mt-1">
+                                        <MapPin className="h-3 w-3 mr-1 text-secondary" />
+                                        {laborer.city}, {laborer.state}
+                                    </div>
+                                </div>
+                            </CardHeader>
+                        </Link>
                         <CardContent className="flex-1 space-y-4">
                             <div className="flex flex-wrap gap-2">
                                 {laborer.skills?.map((skill, index) => (
