@@ -12,13 +12,14 @@ interface PageProps {
 }
 
 export default async function ReviewsPage({ params }: PageProps) {
+    const resolvedParams = await params;
     const supabase = await createClient();
 
     // Fetch user profile
     const { data: profile, error } = await supabase
         .from("profiles")
         .select("id, full_name, username, role, avatar_url")
-        .eq("id", params.userId)
+        .eq("id", resolvedParams.userId)
         .single();
 
     if (error || !profile) {
@@ -29,7 +30,7 @@ export default async function ReviewsPage({ params }: PageProps) {
     const { data: reviews } = await supabase
         .from("reviews")
         .select("rating")
-        .eq("reviewee_id", params.userId);
+        .eq("reviewee_id", resolvedParams.userId);
 
     const totalReviews = reviews?.length || 0;
     const averageRating = totalReviews > 0
@@ -60,8 +61,8 @@ export default async function ReviewsPage({ params }: PageProps) {
                                     <Star
                                         key={star}
                                         className={`h-6 w-6 ${star <= Math.round(averageRating)
-                                                ? "fill-yellow-400 text-yellow-400"
-                                                : "text-gray-600"
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : "text-gray-600"
                                             }`}
                                     />
                                 ))}
@@ -78,7 +79,7 @@ export default async function ReviewsPage({ params }: PageProps) {
             </Card>
 
             {/* Reviews List */}
-            <ReviewsList userId={params.userId} />
+            <ReviewsList userId={resolvedParams.userId} />
         </div>
     );
 }
