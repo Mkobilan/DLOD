@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/header";
+import { PWAProvider } from "@/components/pwa-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,10 +28,12 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased bg-background text-foreground`}
       >
-        <Header />
-        <div className="pt-16">
-          {children}
-        </div>
+        <PWAProvider>
+          <Header />
+          <div className="pt-16">
+            {children}
+          </div>
+        </PWAProvider>
       </body>
     </html>
   );

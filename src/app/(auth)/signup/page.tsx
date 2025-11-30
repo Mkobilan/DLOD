@@ -8,7 +8,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Loader2, Eye, EyeOff, Download } from "lucide-react";
+import { usePWA } from "@/components/pwa-provider";
+
+function InstallAppText() {
+    const { installPrompt, installApp } = usePWA();
+
+    if (!installPrompt) return null;
+
+    return (
+        <button
+            onClick={installApp}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors"
+        >
+            <Download className="h-4 w-4" />
+            Install App
+        </button>
+    );
+}
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -158,13 +175,14 @@ export default function SignupPage() {
                         </Button>
                     </form>
                 </CardContent>
-                <CardFooter className="flex justify-center">
+                <CardFooter className="flex flex-col gap-4 justify-center">
                     <p className="text-sm text-gray-400">
                         Already have an account?{" "}
                         <Link href="/login" className="text-primary hover:underline">
                             Sign in
                         </Link>
                     </p>
+                    <InstallAppText />
                 </CardFooter>
             </Card>
         </div>

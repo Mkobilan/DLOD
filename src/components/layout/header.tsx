@@ -8,6 +8,26 @@ import NotificationBell from "@/components/ui/notification-bell";
 import Image from "next/image";
 import Link from "next/link";
 import SidebarMenu from "./sidebar-menu";
+import { usePWA } from "@/components/pwa-provider";
+import { Download } from "lucide-react";
+
+function InstallButton() {
+    const { installPrompt, installApp } = usePWA();
+
+    if (!installPrompt) return null;
+
+    return (
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={installApp}
+            className="hidden md:flex gap-2 border-primary text-primary hover:bg-primary hover:text-white"
+        >
+            <Download className="h-4 w-4" />
+            Install App
+        </Button>
+    );
+}
 
 export default function Header() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -65,6 +85,7 @@ export default function Header() {
 
                     {/* Right: Notification Bell + Profile Picture */}
                     <div className="flex items-center gap-3">
+                        <InstallButton />
                         <NotificationBell />
                         {userProfile && (
                             <Link href={`/profile/${userProfile.id}`}>
