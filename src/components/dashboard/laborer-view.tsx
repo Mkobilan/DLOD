@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { MapPin, Briefcase, User, Search } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
 
 
 export default function LaborerDashboard({ profile }: { profile: any }) {
@@ -43,37 +43,7 @@ export default function LaborerDashboard({ profile }: { profile: any }) {
                 </div>
             </header>
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/20">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-white">
-                            Job Requests
-                        </CardTitle>
-                        <Briefcase className="h-4 w-4 text-primary" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">0</div>
-                        <p className="text-xs text-gray-400">
-                            Active job invitations
-                        </p>
-                    </CardContent>
-                </Card>
 
-                <Card className="bg-gradient-to-br from-secondary/20 to-secondary/5 border-secondary/20">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-white">
-                            Profile Views
-                        </CardTitle>
-                        <User className="h-4 w-4 text-secondary" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">0</div>
-                        <p className="text-xs text-gray-400">
-                            Contractors viewed you today
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
 
             <section>
                 <div className="flex justify-between items-center mb-4">
