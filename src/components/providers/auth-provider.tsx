@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const fetchProfile = async (userId: string) => {
+    const fetchProfile = async (userId: string, retries = 3) => {
         try {
             const { data, error } = await supabase
                 .from("profiles")
@@ -86,11 +86,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (error) {
                 console.error("Error fetching profile:", error);
+                if (retries > 0) {
+                    console.log(`Retrying profile fetch... (${retries} attempts left)`);
+                    setTimeout(() => fetchProfile(userId, retries - 1), 1000);
+                }
             } else {
                 setProfile(data);
             }
         } catch (error) {
             console.error("Error in fetchProfile:", error);
+            if (retries > 0) {
+                setTimeout(() => fetchProfile(userId, retries - 1), 1000);
+            }
         }
     };
 
