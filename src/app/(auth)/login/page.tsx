@@ -46,11 +46,9 @@ export default function LoginPage() {
     const supabase = createClient();
     const { user } = useAuth();
 
-    useEffect(() => {
-        if (user) {
-            window.location.href = "/dashboard";
-        }
-    }, [user]);
+    // Removed auto-redirect to prevent loops. 
+    // If user is logged in, they can click "Dashboard" in the menu.
+    // Or we can show a "Go to Dashboard" button instead of the form.
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -88,64 +86,75 @@ export default function LoginPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="m@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="bg-white/5 border-white/10 focus:border-primary/50"
-                            />
+                    {user ? (
+                        <div className="text-center space-y-4 py-8">
+                            <p className="text-white">You are already logged in.</p>
+                            <Link href="/dashboard">
+                                <Button className="w-full bg-gradient-to-r from-primary to-accent">
+                                    Go to Dashboard
+                                </Button>
+                            </Link>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <div className="relative">
+                    ) : (
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
                                 <Input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    id="email"
+                                    type="email"
+                                    placeholder="m@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="bg-white/5 border-white/10 focus:border-primary/50 pr-10"
+                                    className="bg-white/5 border-white/10 focus:border-primary/50"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
-                                </button>
                             </div>
-                        </div>
-                        {error && (
-                            <div className="flex items-center gap-2 text-sm text-red-500 bg-red-500/10 p-3 rounded-md border border-red-500/20">
-                                <AlertCircle className="h-4 w-4" />
-                                <span>{error}</span>
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        className="bg-white/5 border-white/10 focus:border-primary/50 pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                </div>
                             </div>
-                        )}
-                        <Button
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Signing In...
-                                </>
-                            ) : (
-                                "Sign In"
+                            {error && (
+                                <div className="flex items-center gap-2 text-sm text-red-500 bg-red-500/10 p-3 rounded-md border border-red-500/20">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <span>{error}</span>
+                                </div>
                             )}
-                        </Button>
-                    </form>
+                            <Button
+                                type="submit"
+                                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Signing In...
+                                    </>
+                                ) : (
+                                    "Sign In"
+                                )}
+                            </Button>
+                        </form>
+                    )}
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4 justify-center">
                     <p className="text-sm text-gray-400">
