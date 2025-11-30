@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Briefcase, Hammer, User, MessageSquare } from "lucide-react";
+import { MapPin, Phone, Briefcase, Hammer, User, MessageSquare, Star } from "lucide-react";
 import Image from "next/image";
 import EditProfileModal from "./edit-profile-modal";
 import { Button } from "@/components/ui/button";
 import { checkChatPermission, requestChat } from "@/app/actions";
+import { ReviewModal } from "./review-modal";
+import { createClient } from "@/lib/supabase/client";
 
 interface Profile {
     id: string;
@@ -33,10 +35,28 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
     const [canChat, setCanChat] = useState(false);
     const [needsRequest, setNeedsRequest] = useState(false);
     const [requestSent, setRequestSent] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
     const router = useRouter();
     const isOwner = currentUserId === profile.id;
+    const supabase = createClient();
 
     useEffect(() => {
+        const fetchUserRole = async () => {
+            if (currentUserId) {
+                const { data } = await supabase
+                    .from("profiles")
+                    .select("role")
+                    .eq("id", currentUserId)
+                    .single();
+                if (data) {
+                    setCurrentUserRole(data.role);
+                }
+            }
+        };
+
+        fetchUserRole();
+
         if (currentUserId && !isOwner) {
             checkChatPermission(currentUserId, profile.id, profile.role).then((result) => {
                 setCanChat(result.canChat);
@@ -109,9 +129,20 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                             )}
                         </div>
 
+                        </div>
                         <div className="mt-4 md:mt-0 flex gap-2">
                             {isOwner && (
                                 <EditProfileModal profile={profile} onUpdate={handleUpdate} />
+                            )}
+                            {!isOwner && currentUserId && currentUserRole && currentUserRole !== profile.role && (
+                                <Button
+                                    onClick={() => setIsReviewModalOpen(true)}
+                                    variant="secondary"
+                                    className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border border-yellow-500/50"
+                                >
+                                    <Star className="mr-2 h-4 w-4" />
+                                    Review
+                                </Button>
                             )}
                             {!isOwner && currentUserId && canChat && (
                                 <Button
@@ -186,6 +217,15 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                     )}
                 </CardContent>
             </Card>
-        </div>
+
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                reviewerId={currentUserId || ""}
+                revieweeId={profile.id}
+                revieweeName={profile.full_name}
+                onReviewSubmitted={handleUpdate}
+            />
+        </div >
     );
 }

@@ -8,7 +8,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { MapPin, DollarSign, Search, Briefcase, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ContractorModal } from "@/components/profiles/contractor-modal";
 
 interface Job {
     id: string;
@@ -34,7 +33,6 @@ interface Job {
 export default function JobBoard({ jobs, userId }: { jobs: Job[]; userId: string }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [applying, setApplying] = useState<string | null>(null);
-    const [selectedContractor, setSelectedContractor] = useState<any>(null);
     const supabase = createClient();
     const router = useRouter();
 
@@ -71,10 +69,6 @@ export default function JobBoard({ jobs, userId }: { jobs: Job[]; userId: string
         }
     };
 
-    const handleViewContractor = (contractor: any) => {
-        setSelectedContractor(contractor);
-    };
-
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
             <header className="space-y-4">
@@ -100,7 +94,7 @@ export default function JobBoard({ jobs, userId }: { jobs: Job[]; userId: string
                                 <div>
                                     <CardTitle className="text-xl text-white">{job.title}</CardTitle>
                                     <button
-                                        onClick={() => handleViewContractor(job.profiles)}
+                                        onClick={() => router.push(`/profile/${job.contractor_id}`)}
                                         className="text-sm text-primary mt-1 hover:underline text-left"
                                     >
                                         {job.profiles.full_name}
@@ -149,12 +143,6 @@ export default function JobBoard({ jobs, userId }: { jobs: Job[]; userId: string
                     </div>
                 )}
             </div>
-
-            <ContractorModal
-                isOpen={!!selectedContractor}
-                onClose={() => setSelectedContractor(null)}
-                contractor={selectedContractor}
-            />
         </div>
     );
 }
