@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ interface Conversation {
 }
 
 export default function MessagesPage() {
+    const searchParams = useSearchParams();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [activeConversation, setActiveConversation] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -39,6 +41,12 @@ export default function MessagesPage() {
         };
         getUser();
         fetchConversations();
+
+        // Check if there's a user parameter in the URL
+        const userParam = searchParams.get('user');
+        if (userParam) {
+            setActiveConversation(userParam);
+        }
     }, []);
 
     useEffect(() => {
