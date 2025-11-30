@@ -135,7 +135,7 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                 </div>
 
                 <CardHeader className="relative px-6 pb-6 pt-0">
-                    <div className="flex flex-col md:flex-row items-start md:items-end gap-6 -mt-12 mb-4">
+                    <div className="flex flex-col md:flex-row items-start gap-6 -mt-12 mb-4">
                         <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-slate-900 bg-slate-800 shrink-0">
                             {profile.avatar_url ? (
                                 <Image
@@ -151,7 +151,7 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                             )}
                         </div>
 
-                        <div className="flex-1 space-y-1">
+                        <div className="flex-1 space-y-1 md:pt-12">
                             <h1 className="text-3xl font-bold text-white">{profile.full_name}</h1>
                             <div className="flex items-center gap-2 text-gray-400">
                                 <span className="font-medium text-primary">@{profile.username}</span>
@@ -172,7 +172,7 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                         </div>
 
 
-                        <div className="mt-4 md:mt-0 flex flex-col gap-2 w-full md:w-auto min-w-[140px]">
+                        <div className="mt-4 md:mt-12 flex flex-col gap-2 w-full md:w-auto min-w-[140px]">
                             {isOwner && (
                                 <EditProfileModal profile={profile} onUpdate={handleUpdate} />
                             )}
