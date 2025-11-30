@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PlusCircle, Search } from "lucide-react";
@@ -12,10 +13,12 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
                     <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
                     <p className="text-gray-400">Manage your jobs and workers</p>
                 </div>
-                <Button className="bg-primary hover:bg-primary/90">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Post Job
-                </Button>
+                <Link href="/contractor/jobs/new">
+                    <Button className="bg-primary hover:bg-primary/90">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Post Job
+                    </Button>
+                </Link>
             </header>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -53,13 +56,17 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
             <section>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold text-white">Find Laborers</h2>
-                    <Button variant="ghost" className="text-sm">View All</Button>
+                    <Link href="/contractor/search">
+                        <Button variant="ghost" className="text-sm">View All</Button>
+                    </Link>
                 </div>
 
-                <div className="bg-white/5 rounded-xl p-8 text-center border border-white/10">
-                    <Search className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <p className="text-gray-400">Laborer search coming soon...</p>
-                </div>
+                <Link href="/contractor/search">
+                    <div className="bg-white/5 rounded-xl p-8 text-center border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                        <Search className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                        <p className="text-gray-400">Click to search for laborers</p>
+                    </div>
+                </Link>
             </section>
         </div>
     );
