@@ -65,9 +65,8 @@ export default function LoginPage() {
                 throw error;
             }
 
-            // Use window.location.href for a hard navigation to ensure all state is reset
-            // and PWA service worker handles the new page request correctly
-            window.location.href = "/dashboard";
+            // Use router.push for smoother navigation now that AuthProvider is non-blocking
+            router.push("/dashboard");
         } catch (err: any) {
             setError(err.message);
             setLoading(false);

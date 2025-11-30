@@ -43,7 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 if (session?.user) {
                     setUser(session.user);
-                    await fetchProfile(session.user.id);
+                    // Fetch profile asynchronously
+                    fetchProfile(session.user.id);
                 } else {
                     setUser(null);
                     setProfile(null);
@@ -60,9 +61,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (session?.user) {
                 setUser(session.user);
-                // Only fetch profile if we don't have it or if the user changed
+                // Fetch profile asynchronously - don't block loading state
                 if (!profile || profile.id !== session.user.id) {
-                    await fetchProfile(session.user.id);
+                    fetchProfile(session.user.id);
                 }
             } else {
                 setUser(null);
