@@ -1,0 +1,136 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Phone, Briefcase, Hammer, User } from "lucide-react";
+import Image from "next/image";
+import EditProfileModal from "./edit-profile-modal";
+
+interface Profile {
+    id: string;
+    username: string;
+    full_name: string;
+    role: "laborer" | "contractor";
+    bio?: string;
+    skills?: string[];
+    city?: string;
+    state?: string;
+    avatar_url?: string;
+    phone?: string;
+}
+
+interface ProfileViewProps {
+    profile: Profile;
+    currentUserId?: string;
+}
+
+export default function ProfileView({ profile: initialProfile, currentUserId }: ProfileViewProps) {
+    const [profile, setProfile] = useState(initialProfile);
+    const router = useRouter();
+    const isOwner = currentUserId === profile.id;
+
+    const handleUpdate = () => {
+        router.refresh();
+        // In a real app we might refetch data here, but router.refresh() should reload the server component
+        // For client-side updates we can also update local state if we returned the new profile from the modal
+        window.location.reload(); // Simple way to ensure data is fresh
+    };
+
+    return (
+        <div className="container mx-auto p-4 max-w-4xl">
+            <Card className="border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden">
+                <div className="h-32 bg-gradient-to-r from-primary/20 to-secondary/20 relative">
+                    {/* Cover image placeholder */}
+                </div>
+
+                <CardHeader className="relative px-6 pb-6 pt-0">
+                    <div className="flex flex-col md:flex-row items-start md:items-end gap-6 -mt-12 mb-4">
+                        <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-slate-900 bg-slate-800 shrink-0">
+                            {profile.avatar_url ? (
+                                <Image
+                                    src={profile.avatar_url}
+                                    alt={profile.full_name}
+                                    fill
+                                    className="object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                    <User className="h-12 w-12" />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex-1 space-y-1">
+                            <h1 className="text-3xl font-bold text-white">{profile.full_name}</h1>
+                            <div className="flex items-center gap-2 text-gray-400">
+                                <span className="font-medium text-primary">@{profile.username}</span>
+                                <span>•</span>
+                                <span className="capitalize flex items-center gap-1">
+                                    {profile.role === "laborer" ? <Hammer className="h-3 w-3" /> : <Briefcase className="h-3 w-3" />}
+                                    {profile.role}
+                                </span>
+                            </div>
+                            {(profile.city || profile.state) && (
+                                <div className="flex items-center gap-1 text-sm text-gray-500">
+                                    <MapPin className="h-3 w-3" />
+                                    <span>
+                                        {[profile.city, profile.state].filter(Boolean).join(", ")}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {isOwner && (
+                            <div className="mt-4 md:mt-0">
+                                <EditProfileModal profile={profile} onUpdate={handleUpdate} />
+                            </div>
+                        )}
+                    </div>
+                </CardHeader>
+
+                <CardContent className="space-y-8 px-6 pb-8">
+                    {/* Bio Section */}
+                    {profile.bio && (
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold text-white">About</h3>
+                            <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                                {profile.bio}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Contact Info */}
+                    {profile.phone && (
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold text-white">Contact</h3>
+                            <div className="flex items-center gap-2 text-gray-300">
+                                <Phone className="h-4 w-4 text-primary" />
+                                <span>{profile.phone}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Skills Section (Laborer only) */}
+                    {profile.role === "laborer" && profile.skills && profile.skills.length > 0 && (
+                        <div className="space-y-3">
+                            <h3 className="text-lg font-semibold text-white">Skills</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {profile.skills.map((skill, index) => (
+                                    <Badge
+                                        key={index}
+                                        variant="secondary"
+                                        className="bg-white/10 hover:bg-white/20 text-gray-200 border-none px-3 py-1"
+                                    >
+                                        {skill}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
