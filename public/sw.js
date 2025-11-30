@@ -1,4 +1,4 @@
-const CACHE_NAME = "dlod-cache-v2";
+const CACHE_NAME = "dlod-cache-v3";
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
@@ -36,9 +36,53 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
+    // For navigation requests (HTML pages), try network first, then cache
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    // Check if we received a valid response
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+
+                    // Clone the response
+                    var responseToCache = response.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then((cache) => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                    return response;
+                })
+                .catch(() => {
+                    // If network fails, try to serve from cache
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
+
+    // For other requests (assets), try cache first, then network
     event.respondWith(
         caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
+            return response || fetch(event.request).then((response) => {
+                // Check if we received a valid response
+                if (!response || response.status !== 200 || response.type !== 'basic') {
+                    return response;
+                }
+
+                // Clone the response
+                var responseToCache = response.clone();
+
+                caches.open(CACHE_NAME)
+                    .then((cache) => {
+                        cache.put(event.request, responseToCache);
+                    });
+
+                return response;
+            });
         })
     );
 });
