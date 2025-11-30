@@ -24,30 +24,50 @@ export const PWAProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+            // Register service worker
             navigator.serviceWorker
                 .register("/sw.js")
                 .then((registration) => {
-                    console.log("Service Worker registered with scope:", registration.scope);
+                    console.log("✅ Service Worker registered with scope:", registration.scope);
                 })
                 .catch((error) => {
-                    console.error("Service Worker registration failed:", error);
+                    console.error("❌ Service Worker registration failed:", error);
                 });
 
-            window.addEventListener("beforeinstallprompt", (e) => {
+            // Listen for beforeinstallprompt
+            const handleBeforeInstallPrompt = (e: any) => {
+                console.log("🎉 beforeinstallprompt event fired!");
                 e.preventDefault();
                 setInstallPrompt(e);
-                console.log("beforeinstallprompt event captured");
-            });
+            };
 
-            window.addEventListener("appinstalled", () => {
+            window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+            // Listen for app installed
+            const handleAppInstalled = () => {
+                console.log("✅ App installed successfully");
                 setIsInstalled(true);
                 setInstallPrompt(null);
-                console.log("App installed");
-            });
+            };
 
+            window.addEventListener("appinstalled", handleAppInstalled);
+
+            // Check if already running as installed PWA
             if (window.matchMedia("(display-mode: standalone)").matches) {
+                console.log("✅ App is running in standalone mode (already installed)");
                 setIsInstalled(true);
+            } else {
+                console.log("ℹ️ App is running in browser mode (not installed)");
+                console.log("ℹ️ Waiting for beforeinstallprompt event...");
             }
+
+            // Cleanup
+            return () => {
+                window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+                window.removeEventListener("appinstalled", handleAppInstalled);
+            };
+        } else {
+            console.warn("⚠️ Service Workers not supported in this browser");
         }
     }, []);
 
@@ -56,9 +76,9 @@ export const PWAProvider = ({ children }: { children: React.ReactNode }) => {
             installPrompt.prompt();
             installPrompt.userChoice.then((choiceResult: any) => {
                 if (choiceResult.outcome === "accepted") {
-                    console.log("User accepted the install prompt");
+                    console.log("✅ User accepted the install prompt");
                 } else {
-                    console.log("User dismissed the install prompt");
+                    console.log("❌ User dismissed the install prompt");
                 }
                 setInstallPrompt(null);
             });
