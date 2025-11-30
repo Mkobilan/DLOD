@@ -24,16 +24,25 @@ export default function DashboardPage() {
     useEffect(() => {
         const checkSettings = async () => {
             if (user) {
-                const { data: userSettings } = await supabase
-                    .from("user_settings")
-                    .select("has_seen_tutorial")
-                    .eq("user_id", user.id)
-                    .single();
+                try {
+                    const { data: userSettings, error } = await supabase
+                        .from("user_settings")
+                        .select("has_seen_tutorial")
+                        .eq("user_id", user.id)
+                        .single();
 
-                if (userSettings) {
-                    setHasSeenTutorial(userSettings.has_seen_tutorial);
+                    if (error) {
+                        console.error("Error fetching user settings:", error);
+                    }
+
+                    if (userSettings) {
+                        setHasSeenTutorial(userSettings.has_seen_tutorial);
+                    }
+                } catch (error) {
+                    console.error("Error in checkSettings:", error);
+                } finally {
+                    setCheckingSettings(false);
                 }
-                setCheckingSettings(false);
             }
         };
 
@@ -53,7 +62,12 @@ export default function DashboardPage() {
     }
 
     if (!profile) {
-        return null; // Will redirect via useEffect
+        return (
+            <div className="flex flex-col h-[calc(100vh-4rem)] items-center justify-center gap-4">
+                <p className="text-red-500">Error: User profile not found.</p>
+                <p className="text-sm text-gray-400">Please try signing out and signing in again.</p>
+            </div>
+        );
     }
 
     if (profile.role === "laborer") {
