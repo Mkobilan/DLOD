@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +28,7 @@ interface Application {
 }
 
 export default function ApplicationsPage() {
+    const router = useRouter();
     const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedProfile, setSelectedProfile] = useState<Application | null>(null);
@@ -152,7 +154,10 @@ export default function ApplicationsPage() {
                             {app.status === "approved" && (
                                 <Button
                                     className="w-full mt-4 bg-secondary hover:bg-secondary/90"
-                                    onClick={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        router.push(`/messages?user=${app.profiles.id}`);
+                                    }}
                                 >
                                     <MessageSquare className="mr-2 h-4 w-4" /> Send Message
                                 </Button>

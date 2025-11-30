@@ -7,26 +7,26 @@ alter table public.notifications add constraint notifications_type_check
 create or replace function public.handle_new_application()
 returns trigger as $$
 declare
-  job_title text;
-  contractor_id uuid;
-  applicant_name text;
+  _job_title text;
+  _contractor_id uuid;
+  _applicant_name text;
 begin
   -- Get job details
-  select title, contractor_id into job_title, contractor_id
+  select title, contractor_id into _job_title, _contractor_id
   from public.jobs
   where id = new.job_id;
 
   -- Get applicant name
-  select full_name into applicant_name
+  select full_name into _applicant_name
   from public.profiles
   where id = new.laborer_id;
 
   -- Create notification for the contractor
   insert into public.notifications (user_id, type, content, related_id)
   values (
-    contractor_id,
+    _contractor_id,
     'application_received',
-    applicant_name || ' applied for ' || job_title,
+    _applicant_name || ' applied for ' || _job_title,
     new.id -- Store application ID as related_id
   );
 
@@ -45,7 +45,7 @@ create trigger on_application_created
 create or replace function public.handle_application_status_change()
 returns trigger as $$
 declare
-  job_title text;
+  _job_title text;
 begin
   -- Only proceed if status has changed
   if old.status = new.status then
@@ -53,7 +53,7 @@ begin
   end if;
 
   -- Get job details
-  select title into job_title
+  select title into _job_title
   from public.jobs
   where id = new.job_id;
 
@@ -62,7 +62,7 @@ begin
   values (
     new.laborer_id,
     'application_status',
-    'Your application for ' || job_title || ' was ' || new.status,
+    'Your application for ' || _job_title || ' was ' || new.status,
     new.job_id -- Store job ID as related_id so they can view the job
   );
 
