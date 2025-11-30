@@ -129,7 +129,7 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                             )}
                         </div>
 
-                        </div>
+
                         <div className="mt-4 md:mt-0 flex gap-2">
                             {isOwner && (
                                 <EditProfileModal profile={profile} onUpdate={handleUpdate} />
