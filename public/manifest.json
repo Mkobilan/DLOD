@@ -1,10 +1,9 @@
 {
-    {
-        "name": "Day Labor On Demand",
-        "short_name": "DLOD",
-        "description": "Connect with day laborers and contractors instantly.",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#0f172a",
-        "theme_color": "#8b5cf6"
-    }
+    "name": "Day Labor On Demand",
+    "short_name": "DLOD",
+    "description": "Connect with day laborers and contractors instantly.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#8b5cf6"
+}

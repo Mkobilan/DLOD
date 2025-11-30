@@ -18,12 +18,41 @@ export default function OnboardingPage() {
         setError(null);
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            // Try to get the user, with a retry mechanism
+            let user = null;
+            let attempts = 0;
+            const maxAttempts = 3;
 
-            if (!user) {
-                throw new Error("No user found");
+            while (!user && attempts < maxAttempts) {
+                const { data: { user: currentUser } } = await supabase.auth.getUser();
+                if (currentUser) {
+                    user = currentUser;
+                    break;
+                }
+                attempts++;
+                if (attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+                }
             }
 
+            if (!user) {
+                throw new Error("No user session found. Please try logging in again.");
+            }
+
+            // Check if profile already exists
+            const { data: existingProfile } = await supabase
+                .from("profiles")
+                .select("id")
+                .eq("id", user.id)
+                .single();
+
+            if (existingProfile) {
+                // Profile exists, just navigate
+                router.push(role === "laborer" ? "/onboarding/laborer" : "/onboarding/contractor");
+                return;
+            }
+
+            // Create new profile
             const { error } = await supabase
                 .from("profiles")
                 .insert({

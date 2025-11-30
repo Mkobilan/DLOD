@@ -24,7 +24,7 @@ export default function SignupPage() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
@@ -35,6 +35,16 @@ export default function SignupPage() {
             if (error) {
                 throw error;
             }
+
+            // Check if email confirmation is required
+            if (data.user && !data.session) {
+                setError("Please check your email to confirm your account before continuing.");
+                setLoading(false);
+                return;
+            }
+
+            // Wait a moment for session to be established
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             router.push("/onboarding");
         } catch (err: any) {
