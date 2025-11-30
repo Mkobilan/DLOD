@@ -1,37 +1,60 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/components/providers/auth-provider";
 import LaborerDashboard from "@/components/dashboard/laborer-view";
 import ContractorDashboard from "@/components/dashboard/contractor-view";
+import { Loader2 } from "lucide-react";
 
-export default async function DashboardPage() {
-    const supabase = await createClient();
+export default function DashboardPage() {
+    const { user, profile, loading } = useAuth();
+    const router = useRouter();
+    const [hasSeenTutorial, setHasSeenTutorial] = useState(false);
+    const [checkingSettings, setCheckingSettings] = useState(true);
+    const supabase = createClient();
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push("/login");
+        }
+    }, [user, loading, router]);
 
-    if (!user) {
-        redirect("/login");
+    useEffect(() => {
+        const checkSettings = async () => {
+            if (user) {
+                const { data: userSettings } = await supabase
+                    .from("user_settings")
+                    .select("has_seen_tutorial")
+                    .eq("user_id", user.id)
+                    .single();
+
+                if (userSettings) {
+                    setHasSeenTutorial(userSettings.has_seen_tutorial);
+                }
+                setCheckingSettings(false);
+            }
+        };
+
+        if (user) {
+            checkSettings();
+        } else if (!loading) {
+            setCheckingSettings(false);
+        }
+    }, [user, loading]);
+
+    if (loading || checkingSettings) {
+        return (
+            <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
     }
-
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
 
     if (!profile) {
-        // Profile doesn't exist yet, redirect to onboarding
-        redirect("/onboarding");
+        return null; // Will redirect via useEffect
     }
-
-    const { data: userSettings } = await supabase
-        .from("user_settings")
-        .select("has_seen_tutorial")
-        .eq("user_id", user.id)
-        .single();
-
-    const hasSeenTutorial = userSettings?.has_seen_tutorial ?? false;
 
     if (profile.role === "laborer") {
         return <LaborerDashboard profile={profile} hasSeenTutorial={hasSeenTutorial} />;

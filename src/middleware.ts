@@ -39,7 +39,20 @@ export async function middleware(request: NextRequest) {
 
     // Protected routes
     if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        const redirectResponse = NextResponse.redirect(url)
+
+        // Copy cookies from the response (which might have updates) to the redirect response
+        const setCookieHeader = response.headers.get('set-cookie')
+        if (setCookieHeader) {
+            // Split multiple cookies if necessary, but response.cookies is easier
+            response.cookies.getAll().forEach(cookie => {
+                redirectResponse.cookies.set(cookie)
+            })
+        }
+
+        return redirectResponse
     }
 
     return response
