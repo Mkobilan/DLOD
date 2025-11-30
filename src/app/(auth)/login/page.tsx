@@ -44,7 +44,7 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const supabase = createClient();
-    const { user } = useAuth();
+    const { user, signOut } = useAuth();
 
     // Removed auto-redirect to prevent loops. 
     // If user is logged in, they can click "Dashboard" in the menu.
@@ -88,12 +88,21 @@ export default function LoginPage() {
                 <CardContent>
                     {user ? (
                         <div className="text-center space-y-4 py-8">
-                            <p className="text-white">You are already logged in.</p>
-                            <Link href="/dashboard">
-                                <Button className="w-full bg-gradient-to-r from-primary to-accent">
-                                    Go to Dashboard
+                            <p className="text-white">You are currently logged in as {user.email}</p>
+                            <div className="flex flex-col gap-3">
+                                <Link href="/dashboard" className="w-full">
+                                    <Button className="w-full bg-gradient-to-r from-primary to-accent">
+                                        Go to Dashboard
+                                    </Button>
+                                </Link>
+                                <Button
+                                    variant="outline"
+                                    className="w-full border-white/10 hover:bg-white/5"
+                                    onClick={() => signOut()}
+                                >
+                                    Not you? Sign Out
                                 </Button>
-                            </Link>
+                            </div>
                         </div>
                     ) : (
                         <form onSubmit={handleLogin} className="space-y-4">

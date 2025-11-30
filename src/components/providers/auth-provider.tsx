@@ -100,11 +100,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error("Error signing out:", error);
         } finally {
-            // Aggressively clear local storage to prevent stale sessions
-            if (typeof window !== "undefined") {
-                localStorage.clear();
-                sessionStorage.clear();
-            }
             setUser(null);
             setProfile(null);
             window.location.href = "/";
