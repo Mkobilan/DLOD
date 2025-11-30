@@ -73,7 +73,7 @@ export default function Header() {
                                     {userProfile.avatar_url ? (
                                         <Image
                                             src={userProfile.avatar_url}
-                                            alt={userProfile.full_name}
+                                            alt={userProfile.full_name || "User Profile"}
                                             fill
                                             className="object-cover"
                                         />
