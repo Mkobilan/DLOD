@@ -48,9 +48,9 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (user) {
-            router.push("/dashboard");
+            window.location.href = "/dashboard";
         }
-    }, [user, router]);
+    }, [user]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -67,10 +67,11 @@ export default function LoginPage() {
                 throw error;
             }
 
-            router.push("/dashboard");
+            // Use window.location.href for a hard navigation to ensure all state is reset
+            // and PWA service worker handles the new page request correctly
+            window.location.href = "/dashboard";
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setLoading(false);
         }
     };

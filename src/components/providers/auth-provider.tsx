@@ -102,8 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setUser(null);
             setProfile(null);
-            router.push("/");
-            router.refresh();
+            window.location.href = "/";
         }
     };
 
