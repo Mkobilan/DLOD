@@ -96,6 +96,22 @@ export default function NotificationBell() {
         setUnreadCount((prev) => Math.max(0, prev - 1));
     };
 
+    const markAllAsRead = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        await supabase
+            .from("notifications")
+            .update({ is_read: true })
+            .eq("user_id", user.id)
+            .eq("is_read", false);
+
+        setNotifications((prev) =>
+            prev.map((n) => ({ ...n, is_read: true }))
+        );
+        setUnreadCount(0);
+    };
+
     const handleNotificationClick = async (notification: Notification) => {
         await markAsRead(notification.id);
 
@@ -108,6 +124,12 @@ export default function NotificationBell() {
         } else if (notification.type === "message") {
             // Navigate to messages
             router.push("/messages");
+        } else if (notification.type === "application_received") {
+            // Navigate to contractor applications page
+            router.push("/contractor/applications");
+        } else if (notification.type === "application_status") {
+            // Navigate to jobs page (laborer view)
+            router.push("/jobs");
         }
 
         setOpen(false);
@@ -133,8 +155,18 @@ export default function NotificationBell() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0 bg-slate-900 border-white/10" align="end">
-                <div className="p-4 border-b border-white/10">
+                <div className="p-4 border-b border-white/10 flex items-center justify-between">
                     <h3 className="font-semibold text-white">Notifications</h3>
+                    {unreadCount > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={markAllAsRead}
+                            className="text-xs text-primary hover:text-primary/80 hover:bg-white/5"
+                        >
+                            Mark As Read
+                        </Button>
+                    )}
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                     {notifications.length === 0 ? (
