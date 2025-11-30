@@ -8,28 +8,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Loader2, Download } from "lucide-react";
+import { AlertCircle, Loader2, Download, Eye, EyeOff } from "lucide-react";
 import { usePWA } from "@/components/pwa-provider";
 
 function InstallAppText() {
     const { installPrompt, installApp } = usePWA();
 
-    if (!installPrompt) return null;
+    // If browser supports install prompt, show the button
+    if (installPrompt) {
+        return (
+            <button
+                onClick={installApp}
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors"
+            >
+                <Download className="h-4 w-4" />
+                Install App
+            </button>
+        );
+    }
 
+    // Otherwise, show instructions for manual installation
     return (
-        <button
-            onClick={installApp}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors"
-        >
-            <Download className="h-4 w-4" />
-            Install App
-        </button>
+        <div className="text-center text-xs text-gray-500">
+            <p>Install this app: Tap <Download className="inline h-3 w-3" /> in your browser</p>
+        </div>
     );
 }
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -86,14 +95,27 @@ export default function LoginPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="bg-white/5 border-white/10 focus:border-primary/50"
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="bg-white/5 border-white/10 focus:border-primary/50 pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                        <Eye className="h-4 w-4" />
+                                    )}
+                                </button>
+                            </div>
                         </div>
                         {error && (
                             <div className="flex items-center gap-2 text-sm text-red-500 bg-red-500/10 p-3 rounded-md border border-red-500/20">

@@ -14,16 +14,24 @@ import { usePWA } from "@/components/pwa-provider";
 function InstallAppText() {
     const { installPrompt, installApp } = usePWA();
 
-    if (!installPrompt) return null;
+    // If browser supports install prompt, show the button
+    if (installPrompt) {
+        return (
+            <button
+                onClick={installApp}
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors"
+            >
+                <Download className="h-4 w-4" />
+                Install App
+            </button>
+        );
+    }
 
+    // Otherwise, show instructions for manual installation
     return (
-        <button
-            onClick={installApp}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors"
-        >
-            <Download className="h-4 w-4" />
-            Install App
-        </button>
+        <div className="text-center text-xs text-gray-500">
+            <p>Install this app: Tap <Download className="inline h-3 w-3" /> in your browser</p>
+        </div>
     );
 }
 
