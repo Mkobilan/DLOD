@@ -103,7 +103,12 @@ export default function TutorialModal({ role, onComplete }: TutorialModalProps) 
                         />
                     ))}
                 </div>
-                <DialogFooter className="sm:justify-center">
+                <DialogFooter className="sm:justify-center flex-col sm:flex-row gap-2">
+                    {currentStep === 0 && (
+                        <Button variant="ghost" onClick={handleFinish} className="w-full sm:w-auto min-w-[120px]">
+                            Skip
+                        </Button>
+                    )}
                     <Button onClick={handleNext} className="w-full sm:w-auto min-w-[120px]">
                         {currentStep === steps.length - 1 ? "Get Started" : "Next"}
                     </Button>

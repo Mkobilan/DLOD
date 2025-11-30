@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Lock, Eye, Palette, Type } from "lucide-react";
+import { Bell, Lock, Eye, Palette, Type, HelpCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface UserSettings {
@@ -19,6 +19,7 @@ interface UserSettings {
     hide_phone_number: boolean;
     theme: "dark" | "light";
     text_size: "small" | "medium" | "large";
+    has_seen_tutorial: boolean;
 }
 
 export default function SettingsPage() {
@@ -305,6 +306,29 @@ export default function SettingsPage() {
                                 </Button>
                             </div>
                         </div>
+                    </div>
+                </Card>
+
+                {/* Tutorial Settings */}
+                <Card className="bg-slate-800/50 border-white/10 p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <HelpCircle className="h-6 w-6 text-primary" />
+                        <h2 className="text-xl font-semibold text-white">Tutorial</h2>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <Label className="text-white font-medium">App Tour</Label>
+                            <p className="text-sm text-gray-400">View the welcome tutorial again</p>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await updateSettings({ has_seen_tutorial: false });
+                                router.push("/dashboard");
+                            }}
+                        >
+                            Take the Tour
+                        </Button>
                     </div>
                 </Card>
 
