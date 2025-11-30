@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { X, LayoutDashboard, UserCircle, Briefcase, Search, MessageSquare, ClipboardList, LogOut } from "lucide-react";
+import { X, LayoutDashboard, UserCircle, Briefcase, Search, MessageSquare, ClipboardList, LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -110,8 +110,21 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                         })}
                     </nav>
 
-                    {/* Sign Out Button */}
-                    <div className="p-4 border-t border-white/10">
+                    {/* Footer Section */}
+                    <div className="p-4 border-t border-white/10 space-y-2">
+                        <Link
+                            href="/settings"
+                            onClick={onClose}
+                            className={cn(
+                                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                                pathname === "/settings"
+                                    ? "bg-primary text-white"
+                                    : "text-gray-400 hover:bg-white/10 hover:text-white"
+                            )}
+                        >
+                            <Settings className="h-5 w-5" />
+                            <span className="font-medium">Settings</span>
+                        </Link>
                         <Button
                             onClick={handleSignOut}
                             variant="ghost"

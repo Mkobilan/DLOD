@@ -39,6 +39,7 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
     const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
     const [isSaved, setIsSaved] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
+    const [hidePhoneNumber, setHidePhoneNumber] = useState(false);
     const router = useRouter();
     const isOwner = currentUserId === profile.id;
     const supabase = createClient();
@@ -58,6 +59,20 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
         };
 
         fetchUserRole();
+
+        // Fetch privacy settings for the profile owner
+        const fetchPrivacySettings = async () => {
+            const { data } = await supabase
+                .from("user_settings")
+                .select("hide_phone_number")
+                .eq("user_id", profile.id)
+                .single();
+            if (data) {
+                setHidePhoneNumber(data.hide_phone_number);
+            }
+        };
+
+        fetchPrivacySettings();
 
         if (currentUserId && !isOwner) {
             checkChatPermission(currentUserId, profile.id, profile.role).then((result) => {
@@ -266,7 +281,7 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                     )}
 
                     {/* Contact Info */}
-                    {profile.phone && (
+                    {profile.phone && (!hidePhoneNumber || isOwner) && (
                         <div className="space-y-2">
                             <h3 className="text-lg font-semibold text-white">Contact</h3>
                             <div className="flex items-center gap-2 text-gray-300">
