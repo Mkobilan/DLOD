@@ -50,24 +50,35 @@ export default function MessagesContent() {
     }, []);
 
     useEffect(() => {
-        if (activeConversation) {
+        if (activeConversation && currentUserId) {
             fetchMessages(activeConversation);
 
+            // Subscribe to messages in this conversation (both sent and received)
             const channel = supabase
-                .channel('messages')
+                .channel(`messages-${activeConversation}`)
                 .on(
                     'postgres_changes',
                     {
                         event: 'INSERT',
                         schema: 'public',
                         table: 'messages',
-                        filter: `receiver_id=eq.${currentUserId}`,
                     },
                     (payload) => {
-                        if (payload.new.sender_id === activeConversation) {
-                            setMessages((prev) => [...prev, payload.new as Message]);
+                        const newMsg = payload.new as Message;
+                        // Only add message if it's part of the active conversation
+                        if (
+                            (newMsg.sender_id === currentUserId && newMsg.receiver_id === activeConversation) ||
+                            (newMsg.sender_id === activeConversation && newMsg.receiver_id === currentUserId)
+                        ) {
+                            setMessages((prev) => {
+                                // Avoid duplicates
+                                if (prev.some(m => m.id === newMsg.id)) {
+                                    return prev;
+                                }
+                                return [...prev, newMsg];
+                            });
+                            fetchConversations();
                         }
-                        fetchConversations();
                     }
                 )
                 .subscribe();
@@ -147,15 +158,9 @@ export default function MessagesContent() {
 
             if (error) throw error;
 
-            const optimisticMsg: Message = {
-                id: Date.now().toString(),
-                sender_id: currentUserId,
-                receiver_id: activeConversation,
-                content: newMessage,
-                created_at: new Date().toISOString()
-            };
-            setMessages((prev) => [...prev, optimisticMsg]);
+            // Clear input - the real-time subscription will add the message
             setNewMessage("");
+            // Update conversations list to show this as the latest message
             fetchConversations();
         } catch (error) {
             console.error("Error sending message:", error);
