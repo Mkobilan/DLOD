@@ -135,14 +135,24 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                                 <EditProfileModal profile={profile} onUpdate={handleUpdate} />
                             )}
                             {!isOwner && currentUserId && currentUserRole && currentUserRole !== profile.role && (
-                                <Button
-                                    onClick={() => setIsReviewModalOpen(true)}
-                                    variant="secondary"
-                                    className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border border-yellow-500/50"
-                                >
-                                    <Star className="mr-2 h-4 w-4" />
-                                    Review
-                                </Button>
+                                <>
+                                    <Button
+                                        onClick={() => setIsReviewModalOpen(true)}
+                                        variant="secondary"
+                                        className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border border-yellow-500/50"
+                                    >
+                                        <Star className="mr-2 h-4 w-4" />
+                                        Review
+                                    </Button>
+                                    <Button
+                                        onClick={() => router.push(`/reviews/${profile.id}`)}
+                                        variant="outline"
+                                        className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
+                                    >
+                                        <Star className="mr-2 h-4 w-4" />
+                                        Read Reviews
+                                    </Button>
+                                </>
                             )}
                             {!isOwner && currentUserId && canChat && (
                                 <Button
