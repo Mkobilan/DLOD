@@ -51,6 +51,7 @@ export default function MessagesContent() {
 
     useEffect(() => {
         if (activeConversation && currentUserId) {
+            console.log('Setting up subscription for:', { activeConversation, currentUserId });
             fetchMessages(activeConversation);
 
             // Subscribe to messages in this conversation (both sent and received)
@@ -64,26 +65,39 @@ export default function MessagesContent() {
                         table: 'messages',
                     },
                     (payload) => {
+                        console.log('Realtime payload received:', payload);
                         const newMsg = payload.new as Message;
                         // Only add message if it's part of the active conversation
                         if (
                             (newMsg.sender_id === currentUserId && newMsg.receiver_id === activeConversation) ||
                             (newMsg.sender_id === activeConversation && newMsg.receiver_id === currentUserId)
                         ) {
+                            console.log('Message matches active conversation, adding to state');
                             setMessages((prev) => {
                                 // Avoid duplicates
                                 if (prev.some(m => m.id === newMsg.id)) {
+                                    console.log('Duplicate message detected, skipping');
                                     return prev;
                                 }
                                 return [...prev, newMsg];
                             });
                             fetchConversations();
+                        } else {
+                            console.log('Message does NOT match active conversation', {
+                                msgSender: newMsg.sender_id,
+                                msgReceiver: newMsg.receiver_id,
+                                currentUserId,
+                                activeConversation
+                            });
                         }
                     }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('Subscription status:', status);
+                });
 
             return () => {
+                console.log('Cleaning up subscription');
                 supabase.removeChannel(channel);
             };
         }
