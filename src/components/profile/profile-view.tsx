@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Briefcase, Hammer, User, MessageSquare, Star } from "lucide-react";
+import { MapPin, Phone, Briefcase, Hammer, User, MessageSquare, Star, Bookmark, BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import EditProfileModal from "./edit-profile-modal";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,8 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
     const [requestSent, setRequestSent] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+    const [isSaved, setIsSaved] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
     const router = useRouter();
     const isOwner = currentUserId === profile.id;
     const supabase = createClient();
@@ -62,8 +64,21 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                 setCanChat(result.canChat);
                 setNeedsRequest(result.needsRequest);
             });
+
+            // Check if saved
+            if (currentUserRole === 'contractor' && profile.role === 'laborer') {
+                supabase
+                    .from("saved_workers")
+                    .select("id")
+                    .eq("contractor_id", currentUserId)
+                    .eq("worker_id", profile.id)
+                    .single()
+                    .then(({ data }) => {
+                        if (data) setIsSaved(true);
+                    });
+            }
         }
-    }, [currentUserId, profile.id, profile.role, isOwner]);
+    }, [currentUserId, profile.id, profile.role, isOwner, currentUserRole, supabase]);
 
     const handleUpdate = () => {
         router.refresh();
@@ -83,6 +98,33 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
 
     const handleChat = () => {
         router.push(`/messages?user=${profile.id}`);
+    };
+
+    const handleSaveWorker = async () => {
+        if (!currentUserId) return;
+        setSaveLoading(true);
+
+        if (isSaved) {
+            // Unsave
+            const { error } = await supabase
+                .from("saved_workers")
+                .delete()
+                .eq("contractor_id", currentUserId)
+                .eq("worker_id", profile.id);
+
+            if (!error) setIsSaved(false);
+        } else {
+            // Save
+            const { error } = await supabase
+                .from("saved_workers")
+                .insert({
+                    contractor_id: currentUserId,
+                    worker_id: profile.id
+                });
+
+            if (!error) setIsSaved(true);
+        }
+        setSaveLoading(false);
     };
 
     return (
@@ -153,6 +195,26 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                                         Read Reviews
                                     </Button>
                                 </>
+                            )}
+                            {!isOwner && currentUserId && currentUserRole === 'contractor' && profile.role === 'laborer' && (
+                                <Button
+                                    onClick={handleSaveWorker}
+                                    variant="outline"
+                                    className={`border-primary/50 ${isSaved ? 'bg-primary/10 text-primary' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                                    disabled={saveLoading}
+                                >
+                                    {isSaved ? (
+                                        <>
+                                            <BookmarkCheck className="mr-2 h-4 w-4" />
+                                            Saved
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Bookmark className="mr-2 h-4 w-4" />
+                                            Save Worker
+                                        </>
+                                    )}
+                                </Button>
                             )}
                             {!isOwner && currentUserId && canChat && (
                                 <Button

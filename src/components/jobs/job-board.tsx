@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, DollarSign, Search, Briefcase, Star } from "lucide-react";
+import { MapPin, DollarSign, Search, Briefcase, Star, PlusCircle } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface Job {
@@ -30,11 +31,28 @@ interface Job {
     };
 }
 
+import { useState, useEffect } from "react";
+
 export default function JobBoard({ jobs, userId }: { jobs: Job[]; userId: string }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [applying, setApplying] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null);
     const supabase = createClient();
     const router = useRouter();
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const { data } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", userId)
+                .single();
+            if (data) {
+                setUserRole(data.role);
+            }
+        };
+        fetchUserRole();
+    }, [userId, supabase]);
 
     const filteredJobs = jobs.filter((job) =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,9 +90,19 @@ export default function JobBoard({ jobs, userId }: { jobs: Job[]; userId: string
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
             <header className="space-y-4">
-                <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    Find Work
-                </h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        Find Work
+                    </h1>
+                    {userRole === 'contractor' && (
+                        <Link href="/contractor/jobs/new">
+                            <Button className="bg-primary hover:bg-primary/90">
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Post New Job
+                            </Button>
+                        </Link>
+                    )}
+                </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input

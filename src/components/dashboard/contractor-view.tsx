@@ -8,9 +8,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PlusCircle, Search, Briefcase } from "lucide-react";
 
 
+import { useState, useEffect } from "react";
+
 export default function ContractorDashboard({ profile }: { profile: any }) {
     const router = useRouter();
     const supabase = createClient();
+    const [activeJobsCount, setActiveJobsCount] = useState(0);
+    const [savedWorkersCount, setSavedWorkersCount] = useState(0);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            // Fetch active jobs count
+            const { count: jobsCount } = await supabase
+                .from("jobs")
+                .select("*", { count: "exact", head: true })
+                .eq("contractor_id", profile.id)
+                .eq("status", "open");
+
+            if (jobsCount !== null) setActiveJobsCount(jobsCount);
+
+            // Fetch saved workers count
+            const { count: workersCount } = await supabase
+                .from("saved_workers")
+                .select("*", { count: "exact", head: true })
+                .eq("contractor_id", profile.id);
+
+            if (workersCount !== null) setSavedWorkersCount(workersCount);
+        };
+
+        fetchData();
+    }, [profile.id, supabase]);
 
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
@@ -44,27 +71,29 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
                         <BriefcaseIcon className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">0</div>
+                        <div className="text-2xl font-bold text-white">{activeJobsCount}</div>
                         <p className="text-xs text-gray-400">
                             Open positions
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-secondary/20 to-secondary/5 border-secondary/20">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-white">
-                            Active Workers
-                        </CardTitle>
-                        <Users className="h-4 w-4 text-secondary" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">0</div>
-                        <p className="text-xs text-gray-400">
-                            Hired for today
-                        </p>
-                    </CardContent>
-                </Card>
+                <Link href="/contractor/saved-workers">
+                    <Card className="bg-gradient-to-br from-secondary/20 to-secondary/5 border-secondary/20 hover:bg-secondary/10 transition-colors cursor-pointer">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-white">
+                                Saved Workers
+                            </CardTitle>
+                            <Users className="h-4 w-4 text-secondary" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-white">{savedWorkersCount}</div>
+                            <p className="text-xs text-gray-400">
+                                Laborers you've saved
+                            </p>
+                        </CardContent>
+                    </Card>
+                </Link>
             </div>
 
             <section>
