@@ -17,12 +17,11 @@ interface SidebarMenuProps {
 export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const supabase = createClient();
-    const { profile } = useAuth();
+    const { profile, signOut } = useAuth();
     const userRole = profile?.role;
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut();
+        await signOut();
         router.push("/");
     };
 
