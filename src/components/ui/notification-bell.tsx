@@ -29,29 +29,42 @@ export default function NotificationBell() {
     const router = useRouter();
 
     useEffect(() => {
-        fetchNotifications();
+        const setupNotifications = async () => {
+            // Get current user first
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
 
-        // Subscribe to new notifications
-        const channel = supabase
-            .channel("notifications")
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "notifications",
-                },
-                (payload) => {
-                    const newNotif = payload.new as Notification;
-                    setNotifications((prev) => [newNotif, ...prev]);
-                    setUnreadCount((prev) => prev + 1);
-                }
-            )
-            .subscribe();
+            // Fetch initial notifications
+            fetchNotifications();
 
-        return () => {
-            supabase.removeChannel(channel);
+            // Subscribe to new notifications for this user only
+            const channel = supabase
+                .channel("notifications")
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "INSERT",
+                        schema: "public",
+                        table: "notifications",
+                        filter: `user_id=eq.${user.id}`,
+                    },
+                    (payload) => {
+                        console.log("New notification received:", payload);
+                        const newNotif = payload.new as Notification;
+                        setNotifications((prev) => [newNotif, ...prev]);
+                        setUnreadCount((prev) => prev + 1);
+                    }
+                )
+                .subscribe((status) => {
+                    console.log("Notification subscription status:", status);
+                });
+
+            return () => {
+                supabase.removeChannel(channel);
+            };
         };
+
+        setupNotifications();
     }, []);
 
     const fetchNotifications = async () => {
