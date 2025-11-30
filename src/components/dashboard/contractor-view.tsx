@@ -1,11 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PlusCircle, Search } from "lucide-react";
+import { Users, PlusCircle, Search, Briefcase, LogOut } from "lucide-react";
 
 export default function ContractorDashboard({ profile }: { profile: any }) {
+    const router = useRouter();
+    const supabase = createClient();
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        router.push("/");
+    };
+
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
             <header className="flex justify-between items-center">
@@ -13,12 +23,27 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
                     <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
                     <p className="text-gray-400">Manage your jobs and workers</p>
                 </div>
-                <Link href="/contractor/jobs/new">
-                    <Button className="bg-primary hover:bg-primary/90">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Post Job
+                <div className="flex gap-2">
+                    <Link href="/contractor/jobs">
+                        <Button variant="outline" className="border-white/20 hover:bg-white/10">
+                            <Briefcase className="mr-2 h-4 w-4" />
+                            My Jobs
+                        </Button>
+                    </Link>
+                    <Link href="/contractor/jobs/new">
+                        <Button className="bg-primary hover:bg-primary/90">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Post Job
+                        </Button>
+                    </Link>
+                    <Button
+                        variant="ghost"
+                        className="text-gray-400 hover:text-white"
+                        onClick={handleSignOut}
+                    >
+                        <LogOut className="h-4 w-4" />
                     </Button>
-                </Link>
+                </div>
             </header>
 
             <div className="grid gap-4 md:grid-cols-2">
