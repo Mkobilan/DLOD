@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,8 +33,7 @@ export default function LaborerSearchPage() {
         const { data, error } = await supabase
             .from("profiles")
             .select("*")
-            .eq("role", "laborer")
-            .eq("is_available", true); // Only show available laborers initially? Or all? User said "Even if the laborer has not toggled 'available to work' The contractor can still send a message"
+            .eq("role", "laborer");
 
         if (data) {
             setLaborers(data);
@@ -94,10 +94,12 @@ export default function LaborerSearchPage() {
                             </div>
                         </CardContent>
                         <div className="p-6 pt-0 mt-auto">
-                            <Button className="w-full bg-secondary hover:bg-secondary/90 text-white">
-                                <MessageSquare className="mr-2 h-4 w-4" />
-                                Message
-                            </Button>
+                            <Link href={`/messages?user=${laborer.id}`}>
+                                <Button className="w-full bg-secondary hover:bg-secondary/90 text-white">
+                                    <MessageSquare className="mr-2 h-4 w-4" />
+                                    Message
+                                </Button>
+                            </Link>
                         </div>
                     </Card>
                 ))}

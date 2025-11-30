@@ -16,6 +16,7 @@ export default function ContractorOnboarding() {
     const supabase = createClient();
 
     const [formData, setFormData] = useState({
+        username: "",
         full_name: "", // Business Name
         phone: "",
         city: "",
@@ -43,6 +44,7 @@ export default function ContractorOnboarding() {
             const { error } = await supabase
                 .from("profiles")
                 .update({
+                    username: formData.username,
                     full_name: formData.full_name,
                     phone: formData.phone,
                     city: formData.city,
@@ -77,6 +79,12 @@ export default function ContractorOnboarding() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="username">Username</Label>
+                            <Input id="username" value={formData.username} onChange={handleChange} required placeholder="@acmeconstruction" />
+                            <p className="text-xs text-gray-400">This will be used for search and identification</p>
+                        </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="full_name">Business Name</Label>
                             <Input id="full_name" value={formData.full_name} onChange={handleChange} required placeholder="Acme Construction" />
