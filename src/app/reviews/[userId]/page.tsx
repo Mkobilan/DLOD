@@ -41,7 +41,7 @@ export default async function ReviewsPage({ params }: PageProps) {
         <div className="container mx-auto p-4 max-w-4xl">
             {/* Back Button */}
             <Link
-                href={`/profile/${profile.username}`}
+                href={`/profile/${resolvedParams.userId}`}
                 className="inline-flex items-center gap-2 text-primary hover:text-primary/80 mb-6 transition-colors"
             >
                 <ArrowLeft className="h-4 w-4" />

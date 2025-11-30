@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, MapPin, Hammer, MessageSquare } from "lucide-react";
+import { Search, MapPin, Hammer, MessageSquare, Star } from "lucide-react";
 
 interface Laborer {
     id: string;
@@ -17,6 +17,8 @@ interface Laborer {
     skills: string[];
     is_available: boolean;
     avatar_url: string | null;
+    rating: number;
+    review_count: number;
 }
 
 export default function LaborerSearchPage() {
@@ -33,7 +35,7 @@ export default function LaborerSearchPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from("profiles")
-            .select("*")
+            .select("id, full_name, city, state, skills, is_available, avatar_url, rating, review_count")
             .eq("role", "laborer");
 
         if (data) {
@@ -84,7 +86,7 @@ export default function LaborerSearchPage() {
                                         </div>
                                     )}
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <CardTitle className="text-lg text-white hover:text-primary transition-colors">
                                         {laborer.full_name}
                                     </CardTitle>
@@ -92,6 +94,15 @@ export default function LaborerSearchPage() {
                                         <MapPin className="h-3 w-3 mr-1 text-secondary" />
                                         {laborer.city}, {laborer.state}
                                     </div>
+                                </div>
+                                <div className="flex items-center text-yellow-400 text-xs">
+                                    <Star className="h-4 w-4 fill-current mr-1" />
+                                    <span className="font-semibold">
+                                        {laborer.rating > 0 ? laborer.rating.toFixed(1) : "New"}
+                                    </span>
+                                    {laborer.review_count > 0 && (
+                                        <span className="text-gray-400 ml-1">({laborer.review_count})</span>
+                                    )}
                                 </div>
                             </CardHeader>
                         </Link>
