@@ -21,7 +21,9 @@ export default function PostJobPage() {
         pay_rate: "",
         city: "",
         state: "",
+        zip_code: "",
         requirements: "",
+        notes: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -60,7 +62,9 @@ export default function PostJobPage() {
                     pay_rate: formData.pay_rate,
                     city: formData.city,
                     state: formData.state,
+                    zip_code: formData.zip_code,
                     requirements: formData.requirements,
+                    notes: formData.notes,
                     status: "open",
                 });
 
@@ -109,7 +113,7 @@ export default function PostJobPage() {
                             <Input id="pay_rate" value={formData.pay_rate} onChange={handleChange} required placeholder="$20/hr" />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="city">City</Label>
                                 <Input id="city" value={formData.city} onChange={handleChange} required />
@@ -118,11 +122,26 @@ export default function PostJobPage() {
                                 <Label htmlFor="state">State</Label>
                                 <Input id="state" value={formData.state} onChange={handleChange} required />
                             </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="zip_code">Zip Code</Label>
+                                <Input id="zip_code" value={formData.zip_code} onChange={handleChange} required placeholder="12345" />
+                            </div>
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="requirements">Requirements (Safety gear, etc.)</Label>
                             <Input id="requirements" value={formData.requirements} onChange={handleChange} placeholder="Steel toe boots, Hard hat" />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="notes">Additional Notes</Label>
+                            <textarea
+                                id="notes"
+                                className="flex min-h-[80px] w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 backdrop-blur-sm"
+                                value={formData.notes}
+                                onChange={handleChange}
+                                placeholder="Any additional details about the job..."
+                            />
                         </div>
 
                         {error && (

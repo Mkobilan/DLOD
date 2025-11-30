@@ -16,7 +16,9 @@ interface Job {
     pay_rate: string;
     city: string;
     state: string;
+    zip_code: string;
     requirements: string;
+    notes: string;
     status: string;
     created_at: string;
 }
@@ -116,7 +118,7 @@ export default function MyJobsPage() {
                             <CardContent className="flex-1 space-y-4">
                                 <div className="flex items-center text-gray-400 text-sm">
                                     <MapPin className="h-4 w-4 mr-2 text-secondary" />
-                                    {job.city}, {job.state}
+                                    {job.city}, {job.state} {job.zip_code}
                                 </div>
                                 <div className="flex items-center text-green-400 font-semibold">
                                     <DollarSign className="h-4 w-4 mr-2" />
@@ -130,6 +132,11 @@ export default function MyJobsPage() {
                                         <span className="text-xs bg-white/10 px-2 py-1 rounded text-gray-300">
                                             {job.requirements}
                                         </span>
+                                    </div>
+                                )}
+                                {job.notes && (
+                                    <div className="text-sm text-gray-400 italic">
+                                        <strong>Notes:</strong> {job.notes}
                                     </div>
                                 )}
                                 <div className="flex gap-2 pt-4">
