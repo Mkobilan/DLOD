@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface Message {
     id: string;
@@ -22,6 +23,7 @@ interface Conversation {
     full_name: string;
     last_message: string;
     updated_at: string;
+    avatar_url: string | null;
 }
 
 export default function MessagesContent() {
@@ -115,8 +117,8 @@ export default function MessagesContent() {
             .from("messages")
             .select(`
         *,
-        sender:profiles!sender_id(full_name),
-        receiver:profiles!receiver_id(full_name)
+        sender:profiles!sender_id(full_name, avatar_url),
+        receiver:profiles!receiver_id(full_name, avatar_url)
       `)
             .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
             .order("created_at", { ascending: false });
@@ -126,14 +128,15 @@ export default function MessagesContent() {
 
             data.forEach((msg: any) => {
                 const otherUserId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
-                const otherUserName = msg.sender_id === user.id ? msg.receiver.full_name : msg.sender.full_name;
+                const otherProfile = msg.sender_id === user.id ? msg.receiver : msg.sender;
 
                 if (!convMap.has(otherUserId)) {
                     convMap.set(otherUserId, {
                         user_id: otherUserId,
-                        full_name: otherUserName,
+                        full_name: otherProfile.full_name,
                         last_message: msg.content,
-                        updated_at: msg.created_at
+                        updated_at: msg.created_at,
+                        avatar_url: otherProfile.avatar_url
                     });
                 }
             });
@@ -192,13 +195,29 @@ export default function MessagesContent() {
                         <div
                             key={conv.user_id}
                             className={cn(
-                                "p-3 rounded-lg cursor-pointer transition-colors hover:bg-white/10",
+                                "p-3 rounded-lg cursor-pointer transition-colors hover:bg-white/10 flex items-center gap-3",
                                 activeConversation === conv.user_id ? "bg-white/10 border border-primary/30" : ""
                             )}
                             onClick={() => setActiveConversation(conv.user_id)}
                         >
-                            <div className="font-semibold text-white">{conv.full_name}</div>
-                            <div className="text-sm text-gray-400 truncate">{conv.last_message}</div>
+                            <div className="relative h-10 w-10 rounded-full overflow-hidden bg-slate-800 shrink-0 border border-white/10">
+                                {conv.avatar_url ? (
+                                    <Image
+                                        src={conv.avatar_url}
+                                        alt={conv.full_name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                        <User className="h-5 w-5" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-white truncate">{conv.full_name}</div>
+                                <div className="text-sm text-gray-400 truncate">{conv.last_message}</div>
+                            </div>
                         </div>
                     ))}
                     {conversations.length === 0 && (
@@ -211,8 +230,21 @@ export default function MessagesContent() {
                 {activeConversation ? (
                     <>
                         <CardHeader className="border-b border-white/10">
-                            <CardTitle className="text-lg text-white flex items-center gap-2">
-                                <User className="h-5 w-5" />
+                            <CardTitle className="text-lg text-white flex items-center gap-3">
+                                <div className="relative h-8 w-8 rounded-full overflow-hidden bg-slate-800 border border-white/10">
+                                    {conversations.find(c => c.user_id === activeConversation)?.avatar_url ? (
+                                        <Image
+                                            src={conversations.find(c => c.user_id === activeConversation)!.avatar_url!}
+                                            alt="User"
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                            <User className="h-4 w-4" />
+                                        </div>
+                                    )}
+                                </div>
                                 {conversations.find(c => c.user_id === activeConversation)?.full_name}
                             </CardTitle>
                         </CardHeader>
