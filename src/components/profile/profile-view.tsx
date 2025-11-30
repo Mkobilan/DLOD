@@ -63,17 +63,13 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
         // Fetch privacy settings for the profile owner
         const fetchPrivacySettings = async () => {
             const { data, error } = await supabase
-                .from("user_settings")
-                .select("hide_phone_number")
-                .eq("user_id", profile.id)
-                .single();
+                .rpc('should_hide_phone_number', { target_user_id: profile.id });
 
             if (error) {
-                console.log("No settings found for user:", profile.id, error);
+                console.error("Error fetching privacy settings:", error);
                 setHidePhoneNumber(false);
-            } else if (data) {
-                console.log("Privacy settings loaded:", data.hide_phone_number, "for user:", profile.id);
-                setHidePhoneNumber(data.hide_phone_number);
+            } else {
+                setHidePhoneNumber(data);
             }
         };
 
