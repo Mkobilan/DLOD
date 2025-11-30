@@ -6,15 +6,17 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PlusCircle, Search, Briefcase } from "lucide-react";
+import TutorialModal from "@/components/tutorial/tutorial-modal";
 
 
 import { useState, useEffect } from "react";
 
-export default function ContractorDashboard({ profile }: { profile: any }) {
+export default function ContractorDashboard({ profile, hasSeenTutorial }: { profile: any, hasSeenTutorial: boolean }) {
     const router = useRouter();
     const supabase = createClient();
     const [activeJobsCount, setActiveJobsCount] = useState(0);
     const [savedWorkersCount, setSavedWorkersCount] = useState(0);
+    const [showTutorial, setShowTutorial] = useState(!hasSeenTutorial);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,8 +41,21 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
         fetchData();
     }, [profile.id, supabase]);
 
+    const handleTutorialComplete = async () => {
+        setShowTutorial(false);
+        await supabase
+            .from("user_settings")
+            .update({ has_seen_tutorial: true })
+            .eq("user_id", profile.id);
+
+        router.refresh();
+    };
+
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
+            {showTutorial && (
+                <TutorialModal role="contractor" onComplete={handleTutorialComplete} />
+            )}
             <header className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>

@@ -9,10 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MapPin, Search } from "lucide-react";
+import TutorialModal from "@/components/tutorial/tutorial-modal";
 
 
-export default function LaborerDashboard({ profile }: { profile: any }) {
+export default function LaborerDashboard({ profile, hasSeenTutorial }: { profile: any, hasSeenTutorial: boolean }) {
     const [isAvailable, setIsAvailable] = useState(profile.is_available);
+    const [showTutorial, setShowTutorial] = useState(!hasSeenTutorial);
     const supabase = createClient();
     const router = useRouter();
 
@@ -24,8 +26,21 @@ export default function LaborerDashboard({ profile }: { profile: any }) {
             .eq("id", profile.id);
     };
 
+    const handleTutorialComplete = async () => {
+        setShowTutorial(false);
+        await supabase
+            .from("user_settings")
+            .update({ has_seen_tutorial: true })
+            .eq("user_id", profile.id);
+
+        router.refresh();
+    };
+
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
+            {showTutorial && (
+                <TutorialModal role="laborer" onComplete={handleTutorialComplete} />
+            )}
             <header className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Hello, {profile.full_name}</h1>

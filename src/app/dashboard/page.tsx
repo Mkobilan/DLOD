@@ -25,10 +25,18 @@ export default async function DashboardPage() {
         redirect("/onboarding");
     }
 
+    const { data: userSettings } = await supabase
+        .from("user_settings")
+        .select("has_seen_tutorial")
+        .eq("user_id", user.id)
+        .single();
+
+    const hasSeenTutorial = userSettings?.has_seen_tutorial ?? false;
+
     if (profile.role === "laborer") {
-        return <LaborerDashboard profile={profile} />;
+        return <LaborerDashboard profile={profile} hasSeenTutorial={hasSeenTutorial} />;
     } else if (profile.role === "contractor") {
-        return <ContractorDashboard profile={profile} />;
+        return <ContractorDashboard profile={profile} hasSeenTutorial={hasSeenTutorial} />;
     }
 
     return <div>Unknown role</div>;
