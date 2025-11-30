@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea"; // Need to create
+import { Textarea } from "@/components/ui/textarea";
 import { Star, Loader2 } from "lucide-react";
 
 interface ReviewModalProps {
@@ -81,7 +81,7 @@ export function ReviewModal({ isOpen, onClose, revieweeId, revieweeName }: Revie
                     <Textarea
                         placeholder="Write a quick review (optional)..."
                         value={comment}
-                        onChange={(e) => setComment(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
                         className="bg-black/20 border-white/10 text-white"
                     />
                 </div>
