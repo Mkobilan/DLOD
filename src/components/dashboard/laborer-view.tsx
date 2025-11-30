@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { MapPin, Briefcase, User, Search, LogOut } from "lucide-react";
-import NotificationBell from "@/components/ui/notification-bell";
+import { MapPin, Briefcase, User, Search } from "lucide-react";
 
 
 export default function LaborerDashboard({ profile }: { profile: any }) {
@@ -25,11 +24,6 @@ export default function LaborerDashboard({ profile }: { profile: any }) {
             .eq("id", profile.id);
     };
 
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        router.push("/");
-    };
-
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
             <header className="flex justify-between items-center">
@@ -37,25 +31,15 @@ export default function LaborerDashboard({ profile }: { profile: any }) {
                     <h1 className="text-2xl font-bold text-white">Hello, {profile.full_name}</h1>
                     <p className="text-gray-400">Ready to work today?</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center space-x-2 bg-white/5 p-2 rounded-lg border border-white/10">
-                        <Switch
-                            id="availability"
-                            checked={isAvailable}
-                            onCheckedChange={toggleAvailability}
-                        />
-                        <Label htmlFor="availability" className={isAvailable ? "text-green-400" : "text-gray-400"}>
-                            {isAvailable ? "Available" : "Offline"}
-                        </Label>
-                    </div>
-                    <NotificationBell />
-                    <Button
-                        variant="ghost"
-                        className="text-gray-400 hover:text-white"
-                        onClick={handleSignOut}
-                    >
-                        <LogOut className="h-4 w-4" />
-                    </Button>
+                <div className="flex items-center space-x-2 bg-white/5 p-2 rounded-lg border border-white/10">
+                    <Switch
+                        id="availability"
+                        checked={isAvailable}
+                        onCheckedChange={toggleAvailability}
+                    />
+                    <Label htmlFor="availability" className={isAvailable ? "text-green-400" : "text-gray-400"}>
+                        {isAvailable ? "Available" : "Offline"}
+                    </Label>
                 </div>
             </header>
 

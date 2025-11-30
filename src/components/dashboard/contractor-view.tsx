@@ -5,18 +5,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PlusCircle, Search, Briefcase, LogOut } from "lucide-react";
-import NotificationBell from "@/components/ui/notification-bell";
+import { Users, PlusCircle, Search, Briefcase } from "lucide-react";
 
 
 export default function ContractorDashboard({ profile }: { profile: any }) {
     const router = useRouter();
     const supabase = createClient();
-
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        router.push("/");
-    };
 
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
@@ -38,14 +32,6 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
                             Post Job
                         </Button>
                     </Link>
-                    <NotificationBell />
-                    <Button
-                        variant="ghost"
-                        className="text-gray-400 hover:text-white"
-                        onClick={handleSignOut}
-                    >
-                        <LogOut className="h-4 w-4" />
-                    </Button>
                 </div>
             </header>
 

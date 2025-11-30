@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import RightNav from "@/components/layout/right-nav";
+import Header from "@/components/layout/header";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,8 +27,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased bg-background text-foreground`}
       >
-        <RightNav />
-        <div className="pr-20">
+        <Header />
+        <div className="pt-16">
           {children}
         </div>
       </body>
