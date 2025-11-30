@@ -100,9 +100,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error("Error signing out:", error);
         } finally {
+            // Nuclear option: Clear everything to ensure we get a fresh state
+            if (typeof window !== "undefined") {
+                localStorage.clear();
+                sessionStorage.clear();
+                // Clear cookies if possible (though HttpOnly ones can't be cleared from JS)
+                document.cookie.split(";").forEach((c) => {
+                    document.cookie = c
+                        .replace(/^ +/, "")
+                        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+            }
             setUser(null);
             setProfile(null);
-            window.location.href = "/";
+            // Force a complete reload to the login page with a timestamp to bust cache
+            window.location.href = `/login?t=${Date.now()}`;
         }
     };
 
