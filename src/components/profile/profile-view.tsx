@@ -172,35 +172,47 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                         </div>
 
 
-                        <div className="mt-4 md:mt-0 flex gap-2">
+                        <div className="mt-4 md:mt-0 flex flex-col gap-2 w-full md:w-auto min-w-[140px]">
                             {isOwner && (
                                 <EditProfileModal profile={profile} onUpdate={handleUpdate} />
                             )}
-                            {!isOwner && currentUserId && currentUserRole && currentUserRole !== profile.role && (
-                                <>
-                                    <Button
-                                        onClick={() => setIsReviewModalOpen(true)}
-                                        variant="secondary"
-                                        className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border border-yellow-500/50"
-                                    >
-                                        <Star className="mr-2 h-4 w-4" />
-                                        Review
-                                    </Button>
-                                    <Button
-                                        onClick={() => router.push(`/reviews/${profile.id}`)}
-                                        variant="outline"
-                                        className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
-                                    >
-                                        <Star className="mr-2 h-4 w-4" />
-                                        Read Reviews
-                                    </Button>
-                                </>
+
+                            {/* 1. Chat Actions */}
+                            {!isOwner && currentUserId && canChat && (
+                                <Button
+                                    onClick={handleChat}
+                                    className="bg-primary hover:bg-primary/90 w-full"
+                                >
+                                    <MessageSquare className="mr-2 h-4 w-4" />
+                                    Chat
+                                </Button>
                             )}
+                            {!isOwner && currentUserId && needsRequest && !requestSent && (
+                                <Button
+                                    onClick={handleChatRequest}
+                                    variant="outline"
+                                    className="border-primary text-primary hover:bg-primary/10 w-full"
+                                >
+                                    <MessageSquare className="mr-2 h-4 w-4" />
+                                    Request Chat
+                                </Button>
+                            )}
+                            {!isOwner && currentUserId && requestSent && (
+                                <Button
+                                    disabled
+                                    variant="outline"
+                                    className="border-gray-500 text-gray-500 w-full"
+                                >
+                                    Request Sent
+                                </Button>
+                            )}
+
+                            {/* 2. Save Worker */}
                             {!isOwner && currentUserId && currentUserRole === 'contractor' && profile.role === 'laborer' && (
                                 <Button
                                     onClick={handleSaveWorker}
                                     variant="outline"
-                                    className={`border-primary/50 ${isSaved ? 'bg-primary/10 text-primary' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                                    className={`border-primary/50 w-full ${isSaved ? 'bg-primary/10 text-primary' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
                                     disabled={saveLoading}
                                 >
                                     {isSaved ? (
@@ -216,33 +228,27 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                                     )}
                                 </Button>
                             )}
-                            {!isOwner && currentUserId && canChat && (
-                                <Button
-                                    onClick={handleChat}
-                                    className="bg-primary hover:bg-primary/90"
-                                >
-                                    <MessageSquare className="mr-2 h-4 w-4" />
-                                    Chat
-                                </Button>
-                            )}
-                            {!isOwner && currentUserId && needsRequest && !requestSent && (
-                                <Button
-                                    onClick={handleChatRequest}
-                                    variant="outline"
-                                    className="border-primary text-primary hover:bg-primary/10"
-                                >
-                                    <MessageSquare className="mr-2 h-4 w-4" />
-                                    Request Chat
-                                </Button>
-                            )}
-                            {!isOwner && currentUserId && requestSent && (
-                                <Button
-                                    disabled
-                                    variant="outline"
-                                    className="border-gray-500 text-gray-500"
-                                >
-                                    Request Sent
-                                </Button>
+
+                            {/* 3. Review & Read Reviews */}
+                            {!isOwner && currentUserId && currentUserRole && currentUserRole !== profile.role && (
+                                <>
+                                    <Button
+                                        onClick={() => setIsReviewModalOpen(true)}
+                                        variant="secondary"
+                                        className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border border-yellow-500/50 w-full"
+                                    >
+                                        <Star className="mr-2 h-4 w-4" />
+                                        Review
+                                    </Button>
+                                    <Button
+                                        onClick={() => router.push(`/reviews/${profile.id}`)}
+                                        variant="outline"
+                                        className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 w-full"
+                                    >
+                                        <Star className="mr-2 h-4 w-4" />
+                                        Read Reviews
+                                    </Button>
+                                </>
                             )}
                         </div>
                     </div>
