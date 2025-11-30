@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MapPin, Briefcase, User, Search, LogOut } from "lucide-react";
+import NotificationBell from "@/components/ui/notification-bell";
+
 
 export default function LaborerDashboard({ profile }: { profile: any }) {
     const [isAvailable, setIsAvailable] = useState(profile.is_available);
@@ -46,6 +48,7 @@ export default function LaborerDashboard({ profile }: { profile: any }) {
                             {isAvailable ? "Available" : "Offline"}
                         </Label>
                     </div>
+                    <NotificationBell />
                     <Button
                         variant="ghost"
                         className="text-gray-400 hover:text-white"

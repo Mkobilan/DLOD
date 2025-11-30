@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Briefcase, Hammer, User } from "lucide-react";
+import { MapPin, Phone, Briefcase, Hammer, User, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import EditProfileModal from "./edit-profile-modal";
+import { Button } from "@/components/ui/button";
+import { checkChatPermission, requestChat } from "@/app/actions";
 
 interface Profile {
     id: string;
@@ -28,14 +30,39 @@ interface ProfileViewProps {
 
 export default function ProfileView({ profile: initialProfile, currentUserId }: ProfileViewProps) {
     const [profile, setProfile] = useState(initialProfile);
+    const [canChat, setCanChat] = useState(false);
+    const [needsRequest, setNeedsRequest] = useState(false);
+    const [requestSent, setRequestSent] = useState(false);
     const router = useRouter();
     const isOwner = currentUserId === profile.id;
+
+    useEffect(() => {
+        if (currentUserId && !isOwner) {
+            checkChatPermission(currentUserId, profile.id, profile.role).then((result) => {
+                setCanChat(result.canChat);
+                setNeedsRequest(result.needsRequest);
+            });
+        }
+    }, [currentUserId, profile.id, profile.role, isOwner]);
 
     const handleUpdate = () => {
         router.refresh();
         // In a real app we might refetch data here, but router.refresh() should reload the server component
         // For client-side updates we can also update local state if we returned the new profile from the modal
         window.location.reload(); // Simple way to ensure data is fresh
+    };
+
+    const handleChatRequest = async () => {
+        const result = await requestChat(profile.id, profile.full_name);
+        if (result.success) {
+            setRequestSent(true);
+        } else {
+            alert(result.error || "Failed to send chat request");
+        }
+    };
+
+    const handleChat = () => {
+        router.push(`/messages?user=${profile.id}`);
     };
 
     return (
@@ -82,11 +109,39 @@ export default function ProfileView({ profile: initialProfile, currentUserId }: 
                             )}
                         </div>
 
-                        {isOwner && (
-                            <div className="mt-4 md:mt-0">
+                        <div className="mt-4 md:mt-0 flex gap-2">
+                            {isOwner && (
                                 <EditProfileModal profile={profile} onUpdate={handleUpdate} />
-                            </div>
-                        )}
+                            )}
+                            {!isOwner && currentUserId && canChat && (
+                                <Button
+                                    onClick={handleChat}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
+                                    <MessageSquare className="mr-2 h-4 w-4" />
+                                    Chat
+                                </Button>
+                            )}
+                            {!isOwner && currentUserId && needsRequest && !requestSent && (
+                                <Button
+                                    onClick={handleChatRequest}
+                                    variant="outline"
+                                    className="border-primary text-primary hover:bg-primary/10"
+                                >
+                                    <MessageSquare className="mr-2 h-4 w-4" />
+                                    Request Chat
+                                </Button>
+                            )}
+                            {!isOwner && currentUserId && requestSent && (
+                                <Button
+                                    disabled
+                                    variant="outline"
+                                    className="border-gray-500 text-gray-500"
+                                >
+                                    Request Sent
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </CardHeader>
 

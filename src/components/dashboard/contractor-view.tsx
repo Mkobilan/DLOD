@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PlusCircle, Search, Briefcase, LogOut } from "lucide-react";
+import NotificationBell from "@/components/ui/notification-bell";
+
 
 export default function ContractorDashboard({ profile }: { profile: any }) {
     const router = useRouter();
@@ -36,6 +38,7 @@ export default function ContractorDashboard({ profile }: { profile: any }) {
                             Post Job
                         </Button>
                     </Link>
+                    <NotificationBell />
                     <Button
                         variant="ghost"
                         className="text-gray-400 hover:text-white"
