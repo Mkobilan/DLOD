@@ -19,6 +19,9 @@ create table public.profiles (
   search_radius int default 10, -- in miles
   rating float default 0,
   review_count int default 0,
+  subscription_status text,
+  stripe_customer_id text,
+  stripe_subscription_id text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

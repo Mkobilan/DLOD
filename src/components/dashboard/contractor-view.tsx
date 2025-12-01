@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PlusCircle, Search, Briefcase } from "lucide-react";
+import { Users, PlusCircle, Search, Briefcase, Crown, Loader2 } from "lucide-react";
 import TutorialModal from "@/components/tutorial/tutorial-modal";
+import { toast } from "sonner";
 
 
 import { useState, useEffect } from "react";
@@ -17,6 +18,14 @@ export default function ContractorDashboard({ profile, hasSeenTutorial }: { prof
     const [activeJobsCount, setActiveJobsCount] = useState(0);
     const [savedWorkersCount, setSavedWorkersCount] = useState(0);
     const [showTutorial, setShowTutorial] = useState(!hasSeenTutorial);
+    const [cancelingSubscription, setCancelingSubscription] = useState(false);
+
+    // Check subscription status for contractors
+    useEffect(() => {
+        if (profile.role === "contractor" && profile.subscription_status !== "active") {
+            router.push("/onboarding/contractor");
+        }
+    }, [profile, router]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,6 +60,31 @@ export default function ContractorDashboard({ profile, hasSeenTutorial }: { prof
         router.refresh();
     };
 
+    const handleCancelSubscription = async () => {
+        if (!confirm("Are you sure you want to cancel your subscription? You will lose access at the end of your billing period.")) {
+            return;
+        }
+
+        setCancelingSubscription(true);
+        try {
+            const response = await fetch("/api/stripe/cancel", {
+                method: "POST",
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to cancel subscription");
+            }
+
+            toast.success("Subscription will be canceled at the end of your billing period");
+            router.refresh();
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to cancel subscription. Please try again.");
+        } finally {
+            setCancelingSubscription(false);
+        }
+    };
+
     return (
         <div className="container mx-auto p-4 space-y-6 pb-20">
             {showTutorial && (
@@ -58,10 +92,33 @@ export default function ContractorDashboard({ profile, hasSeenTutorial }: { prof
             )}
             <header className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
+                        {profile.subscription_status === "active" && (
+                            <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 px-3 py-1 rounded-full">
+                                <Crown className="h-4 w-4 text-yellow-500" />
+                                <span className="text-xs font-semibold text-yellow-500">PRO</span>
+                            </div>
+                        )}
+                    </div>
                     <p className="text-gray-400">Manage your jobs and workers</p>
                 </div>
                 <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        className="border-red-500/30 hover:bg-red-500/10 text-red-400"
+                        onClick={handleCancelSubscription}
+                        disabled={cancelingSubscription}
+                    >
+                        {cancelingSubscription ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Canceling...
+                            </>
+                        ) : (
+                            "Unsubscribe"
+                        )}
+                    </Button>
                     <Link href="/contractor/jobs">
                         <Button variant="outline" className="border-white/20 hover:bg-white/10">
                             <Briefcase className="mr-2 h-4 w-4" />
