@@ -6,6 +6,7 @@ interface PWAContextType {
     installPrompt: any;
     isInstalled: boolean;
     installApp: () => void;
+    checkForUpdates: () => Promise<boolean>;
 }
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined);
@@ -85,8 +86,24 @@ export const PWAProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    const checkForUpdates = async (): Promise<boolean> => {
+        if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                await registration.update();
+
+                if (registration.installing || registration.waiting) {
+                    return true;
+                }
+            } catch (error) {
+                console.error("Error checking for updates:", error);
+            }
+        }
+        return false;
+    };
+
     return (
-        <PWAContext.Provider value={{ installPrompt, isInstalled, installApp }}>
+        <PWAContext.Provider value={{ installPrompt, isInstalled, installApp, checkForUpdates }}>
             {children}
         </PWAContext.Provider>
     );

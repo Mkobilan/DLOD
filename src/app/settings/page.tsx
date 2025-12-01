@@ -7,8 +7,10 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Lock, Eye, Palette, Type, HelpCircle } from "lucide-react";
+import { Bell, Lock, Eye, Palette, Type, HelpCircle, Smartphone, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { usePWA } from "@/components/pwa-provider";
+import { toast } from "sonner";
 
 interface UserSettings {
     notification_chat_request: boolean;
@@ -24,6 +26,8 @@ interface UserSettings {
 
 export default function SettingsPage() {
     const router = useRouter();
+    const { checkForUpdates } = usePWA();
+    const [checkingUpdate, setCheckingUpdate] = useState(false);
     const supabase = createClient();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -102,6 +106,23 @@ export default function SettingsPage() {
             console.error("Error updating settings:", error);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleCheckForUpdates = async () => {
+        setCheckingUpdate(true);
+        try {
+            const hasUpdate = await checkForUpdates();
+            if (hasUpdate) {
+                toast.success("New version available! Reloading...");
+                window.location.reload();
+            } else {
+                toast.info("App is up to date");
+            }
+        } catch (error) {
+            toast.error("Failed to check for updates");
+        } finally {
+            setCheckingUpdate(false);
         }
     };
 
@@ -328,6 +349,34 @@ export default function SettingsPage() {
                             }}
                         >
                             Take the Tour
+                        </Button>
+                    </div>
+                </Card>
+
+                {/* App Info & Updates */}
+                <Card className="bg-slate-800/50 border-white/10 p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <Smartphone className="h-6 w-6 text-primary" />
+                        <h2 className="text-xl font-semibold text-white">App Info</h2>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <Label className="text-white font-medium">App Version</Label>
+                            <p className="text-sm text-gray-400">Check for the latest updates</p>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={handleCheckForUpdates}
+                            disabled={checkingUpdate}
+                        >
+                            {checkingUpdate ? (
+                                <>
+                                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                    Checking...
+                                </>
+                            ) : (
+                                "Check for Updates"
+                            )}
                         </Button>
                     </div>
                 </Card>
