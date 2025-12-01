@@ -30,8 +30,12 @@ export default function LaborerDashboard({ profile, hasSeenTutorial }: { profile
         setShowTutorial(false);
         await supabase
             .from("user_settings")
-            .update({ has_seen_tutorial: true })
-            .eq("user_id", profile.id);
+            .upsert({
+                user_id: profile.id,
+                has_seen_tutorial: true
+            }, {
+                onConflict: 'user_id'
+            });
 
         router.refresh();
     };
