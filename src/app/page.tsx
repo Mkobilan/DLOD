@@ -13,7 +13,7 @@ export default function Home() {
             Day Labor On Demand
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Connect with skilled laborers or find your next job opportunity instantly.
+            Connect with skilled construction staffing and temporary workers instantly. Find your next gig or hire contractors for your project today.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/signup">
@@ -37,7 +37,7 @@ export default function Home() {
               <CardTitle className="text-white">Find Jobs</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-400">Browse available jobs in your area and apply instantly.</p>
+              <p className="text-gray-400">Browse available construction and general labor jobs in your area and apply instantly.</p>
             </CardContent>
           </Card>
 
@@ -47,7 +47,7 @@ export default function Home() {
               <CardTitle className="text-white">Hire Laborers</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-400">Find skilled workers ready to start immediately.</p>
+              <p className="text-gray-400">Find skilled tradespeople and temporary workers ready to start immediately.</p>
             </CardContent>
           </Card>
 
@@ -68,6 +68,37 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-400">Build trust through verified reviews and ratings.</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Audience Specifics */}
+        <div className="grid md:grid-cols-2 gap-8 mt-24">
+          <Card className="border-white/10 bg-white/5 backdrop-blur-xl p-6">
+            <CardHeader>
+              <CardTitle className="text-2xl text-white mb-2">For Laborers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-6">
+                Looking for flexible work? Join our network of skilled tradespeople and general laborers. Get paid daily for construction, landscaping, and warehouse gigs.
+              </p>
+              <Link href="/signup?role=laborer">
+                <Button className="w-full bg-primary hover:bg-primary/90">Find Work Now</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="border-white/10 bg-white/5 backdrop-blur-xl p-6">
+            <CardHeader>
+              <CardTitle className="text-2xl text-white mb-2">For Contractors</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400 mb-6">
+                Need extra hands? Access our pool of vetted temporary workers. Fill shifts for construction, demolition, and site cleanup instantly.
+              </p>
+              <Link href="/signup?role=contractor">
+                <Button className="w-full bg-secondary hover:bg-secondary/90">Hire Workers</Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

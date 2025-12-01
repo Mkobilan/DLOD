@@ -11,8 +11,23 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DLOD - Day Labor On Demand",
-  description: "Connect with day laborers and contractors instantly.",
+  title: "DLOD - Day Labor On Demand | Construction Staffing & Gig Work",
+  description: "Connect with skilled day laborers and contractors instantly. Find temporary construction jobs or hire workers for your project today.",
+  keywords: [
+    "Day Labor",
+    "Construction Staffing",
+    "Hire Contractors",
+    "Temporary Workers",
+    "Gig Economy",
+    "General Labor",
+    "Skilled Trades",
+    "Daily Pay",
+    "On-Demand Staffing",
+    "Local Contractors"
+  ],
+  verification: {
+    google: "wnwX0v0OGT7E25CuYA6r3_NjExggVU9PFITJXnpMp8U",
+  },
 };
 
 export default function RootLayout({
