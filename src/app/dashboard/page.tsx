@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/components/providers/auth-provider";
 import LaborerDashboard from "@/components/dashboard/laborer-view";
 import ContractorDashboard from "@/components/dashboard/contractor-view";
 import { Loader2 } from "lucide-react";
 
-export default function DashboardPage() {
-    const { user, profile, loading } = useAuth();
+function DashboardContent() {
+    const { user, profile, loading, refreshProfile } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [hasSeenTutorial, setHasSeenTutorial] = useState(false);
     const [checkingSettings, setCheckingSettings] = useState(true);
+    const [verifyingSession, setVerifyingSession] = useState(false);
     const supabase = createClient();
 
     useEffect(() => {
@@ -20,6 +22,35 @@ export default function DashboardPage() {
             router.push("/login");
         }
     }, [user, loading, router]);
+
+    // Verify Stripe session if returning from checkout
+    useEffect(() => {
+        const verifySession = async () => {
+            const sessionId = searchParams.get("session_id");
+
+            if (sessionId && user && !verifyingSession) {
+                setVerifyingSession(true);
+                try {
+                    const response = await fetch(`/api/stripe/verify-session?session_id=${sessionId}`);
+
+                    if (response.ok) {
+                        // Refresh the profile to get updated subscription status
+                        await refreshProfile();
+                        // Remove session_id from URL
+                        router.replace("/dashboard");
+                    }
+                } catch (error) {
+                    console.error("Error verifying session:", error);
+                } finally {
+                    setVerifyingSession(false);
+                }
+            }
+        };
+
+        if (user && !loading) {
+            verifySession();
+        }
+    }, [user, loading, searchParams]);
 
     useEffect(() => {
         const checkSettings = async () => {
@@ -53,10 +84,11 @@ export default function DashboardPage() {
         }
     }, [user, loading]);
 
-    if (loading || checkingSettings) {
+    if (loading || checkingSettings || verifyingSession) {
         return (
             <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                {verifyingSession && <span className="ml-2 text-gray-400">Activating subscription...</span>}
             </div>
         );
     }
@@ -77,4 +109,16 @@ export default function DashboardPage() {
     }
 
     return <div>Unknown role</div>;
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <DashboardContent />
+        </Suspense>
+    );
 }
