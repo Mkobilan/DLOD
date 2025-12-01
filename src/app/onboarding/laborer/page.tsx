@@ -61,7 +61,8 @@ export default function LaborerOnboarding() {
                 throw error;
             }
 
-            router.push("/dashboard");
+            // Force full reload to ensure AuthProvider fetches the updated profile
+            window.location.href = "/dashboard";
         } catch (err: any) {
             setError(err.message);
         } finally {

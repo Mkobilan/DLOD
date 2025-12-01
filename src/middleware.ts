@@ -33,7 +33,28 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Protected routes that require a profile
+    const protectedRoutes = ['/dashboard', '/messages', '/jobs', '/workers', '/settings', '/profile']
+    const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+
+    // If user is authenticated and trying to access protected routes (but not onboarding)
+    if (user && isProtectedRoute && !request.nextUrl.pathname.startsWith('/onboarding')) {
+
+        // Check if profile exists
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('id, role')
+            .eq('id', user.id)
+            .maybeSingle() // Use maybeSingle instead of single to avoid error on 0 rows
+
+        // If no profile exists, redirect to onboarding
+        if (!profile) {
+            console.log('[Middleware] No profile found, redirecting to onboarding')
+            return NextResponse.redirect(new URL('/onboarding', request.url))
+        }
+    }
 
     return response
 }

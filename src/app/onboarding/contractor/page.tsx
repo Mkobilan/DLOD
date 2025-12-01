@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, AlertCircle } from "lucide-react";
+import StepPaywall from "@/components/onboarding/StepPaywall";
 
 export default function ContractorOnboarding() {
+    const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -58,13 +60,18 @@ export default function ContractorOnboarding() {
                 throw error;
             }
 
-            router.push("/dashboard");
+            // Move to paywall step instead of redirecting
+            setStep(2);
         } catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+
+    if (step === 2) {
+        return <StepPaywall />;
+    }
 
     return (
         <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-background to-secondary/20">
@@ -133,7 +140,7 @@ export default function ContractorOnboarding() {
                                     Saving Profile...
                                 </>
                             ) : (
-                                "Complete Profile"
+                                "Next: Subscription"
                             )}
                         </Button>
                     </form>

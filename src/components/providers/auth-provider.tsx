@@ -43,8 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 if (session?.user) {
                     setUser(session.user);
-                    // Fetch profile asynchronously
-                    fetchProfile(session.user.id);
+                    // Fetch profile and wait for it
+                    await fetchProfile(session.user.id);
                 } else {
                     setUser(null);
                     setProfile(null);
@@ -79,11 +79,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProfile = async (userId: string, retries = 3) => {
         try {
+            // Use select() without single() or maybeSingle() to avoid 406 errors
+            // This returns an array, which is safer when we're not sure if the row exists
             const { data, error } = await supabase
                 .from("profiles")
                 .select("*")
-                .eq("id", userId)
-                .single();
+                .eq("id", userId);
 
             if (error) {
                 console.error("Error fetching profile:", error);
@@ -91,8 +92,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     console.log(`Retrying profile fetch... (${retries} attempts left)`);
                     setTimeout(() => fetchProfile(userId, retries - 1), 1000);
                 }
+            } else if (data && data.length > 0) {
+                setProfile(data[0]);
             } else {
-                setProfile(data);
+                // Profile doesn't exist (data is empty array), user needs onboarding
+                console.log("Profile not found, user needs onboarding.");
+                setProfile(null);
             }
         } catch (error) {
             console.error("Error in fetchProfile:", error);

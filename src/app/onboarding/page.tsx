@@ -65,7 +65,8 @@ export default function OnboardingPage() {
                 throw error;
             }
 
-            router.push(role === "laborer" ? "/onboarding/laborer" : "/onboarding/contractor");
+            // Force full reload to ensure AuthProvider fetches the new profile
+            window.location.href = role === "laborer" ? "/onboarding/laborer" : "/onboarding/contractor";
         } catch (err: any) {
             setError(err.message);
             setLoading(false);
