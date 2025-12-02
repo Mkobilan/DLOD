@@ -13,7 +13,7 @@ export default function Home() {
             Day Labor On Demand
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Connect with skilled construction staffing and temporary workers instantly. Find your next gig or hire contractors for your project today.
+            Connect with skilled construction staffing and temporary workers instantly. Find your next gig or hire day laborers for your project today.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/signup">
