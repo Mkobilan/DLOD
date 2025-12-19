@@ -35,11 +35,11 @@ create policy "Public profiles are viewable by everyone."
 
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 
 -- Jobs Table
 create table public.jobs (
@@ -66,11 +66,11 @@ create policy "Jobs are viewable by everyone."
 
 create policy "Contractors can insert jobs."
   on jobs for insert
-  with check ( auth.uid() = contractor_id );
+  with check ( (select auth.uid()) = contractor_id );
 
 create policy "Contractors can update own jobs."
   on jobs for update
-  using ( auth.uid() = contractor_id );
+  using ( (select auth.uid()) = contractor_id );
 
 -- Applications Table
 create table public.applications (
@@ -86,21 +86,17 @@ create table public.applications (
 alter table public.applications enable row level security;
 
 -- Applications Policies
-create policy "Laborers can view their own applications."
+create policy "Users can view relevant applications"
   on applications for select
-  using ( auth.uid() = laborer_id );
-
-create policy "Contractors can view applications for their jobs."
-  on applications for select
-  using ( exists ( select 1 from jobs where jobs.id = applications.job_id and jobs.contractor_id = auth.uid() ) );
+  using ( (select auth.uid()) = laborer_id or exists ( select 1 from jobs where jobs.id = applications.job_id and jobs.contractor_id = (select auth.uid()) ) );
 
 create policy "Laborers can create applications."
   on applications for insert
-  with check ( auth.uid() = laborer_id );
+  with check ( (select auth.uid()) = laborer_id );
 
 create policy "Contractors can update application status."
   on applications for update
-  using ( exists ( select 1 from jobs where jobs.id = applications.job_id and jobs.contractor_id = auth.uid() ) );
+  using ( exists ( select 1 from jobs where jobs.id = applications.job_id and jobs.contractor_id = (select auth.uid()) ) );
 
 -- Messages Table
 create table public.messages (
@@ -118,11 +114,11 @@ alter table public.messages enable row level security;
 -- Messages Policies
 create policy "Users can view their own messages."
   on messages for select
-  using ( auth.uid() = sender_id or auth.uid() = receiver_id );
+  using ( (select auth.uid()) = sender_id or (select auth.uid()) = receiver_id );
 
 create policy "Users can insert messages."
   on messages for insert
-  with check ( auth.uid() = sender_id );
+  with check ( (select auth.uid()) = sender_id );
 
 -- Reviews Table
 create table public.reviews (
@@ -144,7 +140,7 @@ create policy "Reviews are viewable by everyone."
 
 create policy "Users can insert reviews."
   on reviews for insert
-  with check ( auth.uid() = reviewer_id );
+  with check ( (select auth.uid()) = reviewer_id );
 
 -- Storage Buckets (Avatars)
 insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true);

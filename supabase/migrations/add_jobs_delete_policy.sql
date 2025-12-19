@@ -3,4 +3,4 @@
 
 create policy "Contractors can delete own jobs."
   on public.jobs for delete
-  using ( auth.uid() = contractor_id );
+  using ( (select auth.uid()) = contractor_id );

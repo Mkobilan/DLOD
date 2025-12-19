@@ -22,7 +22,7 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Trigger for review validation
 drop trigger if exists on_review_created_check_roles on public.reviews;

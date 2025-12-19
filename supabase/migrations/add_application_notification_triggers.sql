@@ -32,7 +32,7 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Trigger for new applications
 drop trigger if exists on_application_created on public.applications;
@@ -68,7 +68,7 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Trigger for application status changes
 drop trigger if exists on_application_status_change on public.applications;

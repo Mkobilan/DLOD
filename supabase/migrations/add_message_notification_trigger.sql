@@ -20,7 +20,7 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Create trigger on messages table
 drop trigger if exists on_message_created on public.messages;

@@ -16,4 +16,4 @@ begin
   -- Default to false (show phone) if no settings found
   return coalesce(should_hide, false);
 end;
-$$;
+$$ SET search_path = public;

@@ -31,15 +31,15 @@ alter table public.user_settings enable row level security;
 -- Policies
 create policy "Users can view their own settings"
   on public.user_settings for select
-  using (auth.uid() = user_id);
+  using ((select auth.uid()) = user_id);
 
 create policy "Users can insert their own settings"
   on public.user_settings for insert
-  with check (auth.uid() = user_id);
+  with check ((select auth.uid()) = user_id);
 
 create policy "Users can update their own settings"
   on public.user_settings for update
-  using (auth.uid() = user_id);
+  using ((select auth.uid()) = user_id);
 
 -- Function to update updated_at timestamp
 create or replace function public.update_user_settings_updated_at()
@@ -48,7 +48,7 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path = public;
 
 -- Trigger to automatically update updated_at
 create trigger update_user_settings_updated_at
@@ -65,7 +65,7 @@ begin
   on conflict (user_id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Trigger to create default settings when a new profile is created
 create trigger create_default_user_settings_trigger

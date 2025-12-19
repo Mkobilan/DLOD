@@ -14,12 +14,12 @@ alter table public.saved_workers enable row level security;
 -- Policies
 create policy "Contractors can view their saved workers"
     on public.saved_workers for select
-    using (auth.uid() = contractor_id);
+    using ((select auth.uid()) = contractor_id);
 
 create policy "Contractors can save workers"
     on public.saved_workers for insert
-    with check (auth.uid() = contractor_id);
+    with check ((select auth.uid()) = contractor_id);
 
 create policy "Contractors can remove saved workers"
     on public.saved_workers for delete
-    using (auth.uid() = contractor_id);
+    using ((select auth.uid()) = contractor_id);

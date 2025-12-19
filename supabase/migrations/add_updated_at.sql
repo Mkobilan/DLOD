@@ -9,7 +9,7 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path = public;
 
 -- Create trigger for profiles
 drop trigger if exists on_profiles_updated on public.profiles;

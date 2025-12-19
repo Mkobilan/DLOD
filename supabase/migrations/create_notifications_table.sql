@@ -16,14 +16,14 @@ alter table public.notifications enable row level security;
 -- Policies
 create policy "Users can view their own notifications"
   on public.notifications for select
-  using (auth.uid() = user_id);
+  using ((select auth.uid()) = user_id);
 
 create policy "Users can update their own notifications"
   on public.notifications for update
-  using (auth.uid() = user_id);
+  using ((select auth.uid()) = user_id);
 
 -- Allow inserting notifications for other users (e.g. chat requests)
 -- Ideally this should be restricted, but for now we allow authenticated users to insert
 create policy "Users can insert notifications"
   on public.notifications for insert
-  with check (auth.role() = 'authenticated');
+  with check ((select auth.role()) = 'authenticated');

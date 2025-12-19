@@ -20,7 +20,7 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Create trigger on reviews table
 drop trigger if exists on_review_created on public.reviews;

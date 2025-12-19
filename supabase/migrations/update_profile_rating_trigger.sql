@@ -19,7 +19,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Function to update profile rating on delete (uses OLD instead of NEW)
 CREATE OR REPLACE FUNCTION update_profile_rating_on_delete()
@@ -42,7 +42,7 @@ BEGIN
     
     RETURN OLD;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Trigger to update rating after insert
 CREATE TRIGGER update_rating_after_review_insert
